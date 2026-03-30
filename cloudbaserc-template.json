@@ -1,0 +1,26 @@
+{
+  "envId": "YOUR_ACTUAL_ENV_ID_HERE",
+  "version": "2.0",
+  "$schema": "https://framework-1258016615.tcloudbaseapp.com/schema/latest.json",
+  "framework": {
+    "name": "creatorhub",
+    "plugins": {
+      "client": {
+        "use": "@cloudbase/framework-plugin-website",
+        "inputs": {
+          "buildCommand": "",
+          "outputPath": "./",
+          "cloudPath": "/",
+          "ignore": [
+            "node_modules",
+            ".git",
+            ".env",
+            "cloudbaserc.json",
+            "README.md",
+            "*.md"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "send-email",
+  "version": "1.0.0",
+  "description": "处理联系表单邮件发送的云函数",
+  "main": "index.js",
+  "dependencies": {
+    "nodemailer": "^6.9.0"
+  }
+}

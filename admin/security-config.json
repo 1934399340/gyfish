@@ -1,0 +1,23 @@
+{
+  "adminUsers": [
+    {
+      "email": "1934399340@qq.com",
+      "role": "super_admin",
+      "permissions": ["all"],
+      "status": "active"
+    }
+  ],
+  "security": {
+    "allowPublicRegistration": false,
+    "requireInvitation": true,
+    "maxLoginAttempts": 5,
+    "lockoutDuration": 30,
+    "sessionTimeout": 24
+  },
+  "github": {
+    "clientId": "YOUR_GITHUB_CLIENT_ID",
+    "clientSecret": "YOUR_GITHUB_CLIENT_SECRET",
+    "callbackUrl": "https://gyfish-4gbxsy3dc619f1e8.service.tcloudbase.com/auth/github/callback",
+    "allowedUsers": ["1934399340@qq.com"]
+  }
+}

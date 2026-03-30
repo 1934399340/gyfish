@@ -8,8 +8,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://unpkg.com/decap-cms@3.1.0/dist/decap-cms.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/supabase.min.js"></script>
+    <script defer src="https://unpkg.com/decap-cms@3.1.0/dist/decap-cms.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
     <script src="config.js"></script>
     <script src="services/supabase-client.js"></script>
     <script src="services/cloudinary-client.js"></script>
@@ -376,6 +376,11 @@
             color: #818cf8;
         }
 
+        .notification.warn .notification-icon,
+        .notification.warning .notification-icon {
+            color: #f59e0b;
+        }
+
         .notification-content {
             flex: 1;
         }
@@ -636,7 +641,7 @@
                 <div class="header">
                     <div>
                         <h1 class="page-title">内容管理</h1>
-                        <p class="page-subtitle">使用Decap CMS管理您的网站内容</p>
+                        <p class="page-subtitle">使用 Decap CMS + GitHub 管理您的网站内容</p>
                     </div>
                 </div>
 
@@ -794,63 +799,233 @@
         let settingsData = null;
         let portfolioData = [];
         let postsData = [];
+        let supabaseClient = null; // Supabase客户端实例
 
         // 初始化函数
-        function init() {
-            initSupabaseAuth();
-            setupNavigation();
-            setupButtons();
-            loadStatistics();
-            document.getElementById('notificationClose').addEventListener('click', hideNotification);
-        }
-
-        // 初始化Supabase认证
-        function initSupabaseAuth() {
-            if (window.supabase) {
-                window.supabase.auth.onAuthStateChange((event, session) => {
-                    if (event === 'SIGNED_IN' && session) {
-                        currentUser = session.user;
-                        updateUserInfo(session.user);
-                        showNotification('success', '登录成功', `欢迎回来，${session.user.email}`);
-
-                        initDecapCMS();
-                        initSupabaseService();
-                        loadAllData();
-                    } else if (event === 'SIGNED_OUT') {
-                        currentUser = null;
-                        window.location.href = '/admin/login-supabase.html';
+        async function init() {
+            try {
+                console.log('开始初始化后台管理系统...');
+                console.log('当前URL:', window.location.href);
+                console.log('localStorage中有supabase.auth.token:', !!localStorage.getItem('supabase.auth.token'));
+                
+                // 设置基本UI组件（无论认证是否成功）
+                setupNavigation();
+                setupButtons();
+                document.getElementById('notificationClose').addEventListener('click', hideNotification);
+                
+                // 显示加载状态
+                showNotification('info', '正在初始化', '系统正在启动，请稍候...');
+                
+                // 初始化认证系统
+                await initSupabaseAuth();
+                
+                // 加载统计数据（initSupabaseAuth 内部会调用 loadAllData）
+                loadStatistics();
+                
+                // 隐藏加载通知
+                setTimeout(() => {
+                    const notification = document.getElementById('notification');
+                    if (notification.classList.contains('show')) {
+                        hideNotification();
                     }
-                });
-
-                window.supabase.auth.getSession().then(({ data: { session } }) => {
-                    if (!session) {
-                        window.location.href = '/admin/login-supabase.html';
-                    }
-                });
-            } else {
-                showNotification('error', '认证错误', '无法加载认证服务，请刷新页面重试');
+                }, 2000);
+                
+                console.log('后台管理系统初始化完成');
+            } catch (error) {
+                console.error('系统初始化失败:', error);
+                showNotification('error', '初始化失败', '系统初始化过程中出现错误，请刷新页面重试。');
+                
+                // 即使失败也设置基本UI
+                setupNavigation();
+                setupButtons();
+                document.getElementById('notificationClose').addEventListener('click', hideNotification);
+                loadStatistics();
             }
         }
 
-        function initSupabaseService() {
-            if (typeof SupabaseService !== 'undefined') {
-                window.supabaseService = new SupabaseService();
-                const config = {
-                    supabaseUrl: window.APP_CONFIG?.supabaseUrl || 'YOUR_SUPABASE_URL',
-                    supabaseAnonKey: window.APP_CONFIG?.supabaseAnonKey || 'YOUR_SUPABASE_ANON_KEY'
-                };
+        // 初始化Supabase认证
+        async function initSupabaseAuth() {
+            const maxRetries = 3;
+            const retryDelay = 1000;
+            let authInitialized = false;
 
-                if (config.supabaseUrl !== 'YOUR_SUPABASE_URL' && config.supabaseAnonKey !== 'YOUR_SUPABASE_ANON_KEY') {
-                    window.supabaseService.init(config.supabaseUrl, config.supabaseAnonKey).then(success => {
-                        if (success) {
-                            console.log('Supabase 服务初始化成功');
-                            if (typeof MediaService !== 'undefined') {
-                                window.mediaService = new MediaService(window.supabaseService);
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                try {
+                    // 检查 Supabase SDK 是否加载
+                    if (typeof window.supabase === 'undefined') {
+                        throw new Error('Supabase SDK 未加载');
+                    }
+
+                    if (typeof window.supabase.auth === 'undefined') {
+                        throw new Error('Supabase auth 未定义');
+                    }
+
+                    if (typeof window.supabase.createClient === 'undefined') {
+                        throw new Error('Supabase createClient 未定义');
+                    }
+
+                    // 创建Supabase客户端实例（如果尚未创建）
+                    if (!supabaseClient) {
+                        const supabaseConfig = window.APP_CONFIG || {};
+                        const supabaseUrl = supabaseConfig.supabaseUrl || 'https://twfihaxptmhvdnapfovc.supabase.co';
+                        const supabaseAnonKey = supabaseConfig.supabaseAnonKey || 'sb_publishable_IFWl0r0vz0m5Vr4_Gk5w-A_xG9lGTYj';
+                        
+                        const { createClient } = window.supabase;
+                        supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+                            auth: {
+                                persistSession: true,
+                                autoRefreshToken: true,
+                                detectSessionInUrl: true,
+                                storage: window.localStorage,
+                                storageKey: 'supabase.auth.token',
+                                flowType: 'pkce'
+                            }
+                        });
+                    }
+
+                    // 只设置一次认证状态监听器
+                    if (!authInitialized) {
+                        supabaseClient.auth.onAuthStateChange((event, session) => {
+                            console.log('认证状态变化:', event, session ? '有会话' : '无会话');
+                            
+                            if (event === 'SIGNED_IN' && session) {
+                                currentUser = session.user;
+                                updateUserInfo(session.user);
+                                showNotification('success', '登录成功', `欢迎回来，${session.user.email}`);
+                                initDecapCMS();
+                                initSupabaseService();
+                                loadAllData();
+                            } else if (event === 'SIGNED_OUT') {
+                                console.log('用户已登出，正在重定向到登录页面...');
+                                currentUser = null;
+                                // 仅在用户主动登出时重定向，避免误判
+                                // 注意：这里不自动重定向，由登出按钮处理
+                            } else if (event === 'TOKEN_REFRESHED') {
+                                console.log('令牌已刷新，会话保持活跃');
+                            } else if (event === 'USER_UPDATED') {
+                                console.log('用户信息已更新');
+                            } else if (event === 'INITIAL_SESSION') {
+                                console.log('初始会话加载完成');
+                            }
+                        });
+                        authInitialized = true;
+                    }
+
+                    // 检查当前 session，允许重试
+                    let sessionRetryCount = 0;
+                    let sessionData = null;
+                    
+                    while (sessionRetryCount < 2) {
+                        try {
+                            const { data, error } = await supabaseClient.auth.getSession();
+                            if (error) throw error;
+                            
+                            sessionData = data;
+                            break;
+                        } catch (sessionError) {
+                            sessionRetryCount++;
+                            console.warn(`会话获取尝试 ${sessionRetryCount}/2 失败:`, sessionError.message);
+                            
+                            if (sessionRetryCount < 2) {
+                                await new Promise(resolve => setTimeout(resolve, 500));
                             }
                         }
-                    });
-                } else {
-                    console.log('Supabase 未配置，使用本地JSON数据');
+                    }
+
+                    if (!sessionData || !sessionData.session) {
+                        console.warn('未找到有效会话，正在重定向到登录页面');
+                        // 立即重定向到登录页面，避免循环
+                        console.log('重定向到登录页面:', '/admin/login-supabase.html');
+                        window.location.href = '/admin/login-supabase.html';
+                        return;
+                    }
+
+                    console.log(`Supabase 认证初始化成功 (尝试 ${attempt})，用户: ${sessionData.session.user.email}`);
+                    
+                    // 设置当前用户
+                    currentUser = sessionData.session.user;
+                    updateUserInfo(sessionData.session.user);
+                    
+                    return;
+                } catch (error) {
+                    console.warn(`Supabase 认证初始化尝试 ${attempt}/${maxRetries} 失败:`, error.message);
+
+                    if (attempt < maxRetries) {
+                        showNotification('info', '正在重试', `认证服务初始化中... (${attempt}/${maxRetries})`);
+                        await new Promise(resolve => setTimeout(resolve, retryDelay * Math.pow(2, attempt - 1)));
+                    } else {
+                        console.error('Supabase 认证初始化失败，所有重试均已尝试');
+                        showNotification('error', '认证服务异常', '无法连接到认证服务，正在重定向到登录页面...');
+                        
+                        // 认证失败，重定向到登录页面
+                        setTimeout(() => {
+                            window.location.href = 'login-supabase.html';
+                        }, 2000);
+                    }
+                }
+            }
+        }
+
+        async function initSupabaseService() {
+            const maxRetries = 2;
+            const retryDelay = 1000;
+
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                try {
+                    if (typeof SupabaseService === 'undefined') {
+                        throw new Error('SupabaseService 类未定义');
+                    }
+
+                    window.supabaseService = new SupabaseService();
+                    const config = {
+                        supabaseUrl: window.APP_CONFIG?.supabaseUrl || 'YOUR_SUPABASE_URL',
+                        supabaseAnonKey: window.APP_CONFIG?.supabaseAnonKey || 'YOUR_SUPABASE_ANON_KEY'
+                    };
+
+                    if (config.supabaseUrl === 'YOUR_SUPABASE_URL' || config.supabaseAnonKey === 'YOUR_SUPABASE_ANON_KEY') {
+                        throw new Error('Supabase 配置未设置');
+                    }
+
+                    const success = await window.supabaseService.init(config.supabaseUrl, config.supabaseAnonKey);
+                    if (!success) {
+                        throw new Error('Supabase 服务初始化失败');
+                    }
+
+                    console.log(`Supabase 服务初始化成功 (尝试 ${attempt})`);
+                    
+                    // 初始化其他服务
+                    if (typeof MediaService !== 'undefined') {
+                        window.mediaService = new MediaService(window.supabaseService);
+                    }
+                    if (typeof PortfolioService !== 'undefined') {
+                        window.portfolioService = new PortfolioService(window.supabaseService);
+                    }
+                    if (typeof PostsService !== 'undefined') {
+                        window.postsService = new PostsService(window.supabaseService);
+                    }
+                    if (typeof SettingsService !== 'undefined') {
+                        window.settingsService = new SettingsService(window.supabaseService);
+                    }
+                    if (typeof AnalyticsService !== 'undefined') {
+                        window.analyticsService = new AnalyticsService(window.supabaseService);
+                    }
+
+                    return;
+                } catch (error) {
+                    console.warn(`Supabase 服务初始化尝试 ${attempt}/${maxRetries} 失败:`, error.message);
+
+                    if (attempt < maxRetries) {
+                        await new Promise(resolve => setTimeout(resolve, retryDelay * Math.pow(2, attempt - 1)));
+                    } else {
+                        console.error('Supabase 服务初始化失败，所有重试均已尝试');
+                        showNotification('warn', '数据服务异常', '无法连接到数据库服务，将使用本地数据。部分功能可能受限。');
+                        
+                        // 即使服务初始化失败，也设置一个空的supabaseService对象以防止后续错误
+                        window.supabaseService = {
+                            supabase: null,
+                            ensureInitialized: async () => { throw new Error('Supabase 服务未初始化'); }
+                        };
+                    }
                 }
             }
         }
@@ -976,7 +1151,7 @@
                     <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
                         <p style="color: #64748b; font-size: 0.875rem;">
                             <i class="fas fa-edit" style="margin-right: 4px;"></i>
-                            如需修改设置，请使用上方的"内容管理"模块中的Decap CMS进行编辑
+                            如需修改设置，请使用上方的"内容管理"模块中的 Decap CMS + GitHub 进行编辑
                         </p>
                     </div>
                 </div>
@@ -1056,7 +1231,7 @@
                     <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
                         <p style="color: #64748b; font-size: 0.875rem;">
                             <i class="fas fa-edit" style="margin-right: 4px;"></i>
-                            如需添加或编辑作品，请使用上方的"内容管理"模块中的Decap CMS进行操作
+                            如需添加或编辑作品，请使用上方的"内容管理"模块中的 Decap CMS + GitHub 进行操作
                         </p>
                     </div>
                 </div>
@@ -1132,7 +1307,7 @@
                     <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
                         <p style="color: #64748b; font-size: 0.875rem;">
                             <i class="fas fa-edit" style="margin-right: 4px;"></i>
-                            如需添加或编辑文章，请使用上方的"内容管理"模块中的Decap CMS进行操作
+                            如需添加或编辑文章，请使用上方的"内容管理"模块中的 Decap CMS + GitHub 进行操作
                         </p>
                     </div>
                 </div>
@@ -1266,6 +1441,8 @@
             const uploadArea = document.getElementById('mediaUploadArea');
             const dropzone = document.getElementById('mediaDropzone');
             const fileInput = document.getElementById('mediaFileInput');
+
+            const refreshBtn = document.getElementById('refreshMediaBtn');
 
             if (uploadBtn) {
                 uploadBtn.addEventListener('click', () => {
@@ -1436,7 +1613,7 @@
                     <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
                         <p style="color: #64748b; font-size: 0.875rem;">
                             <i class="fas fa-chart-line" style="margin-right: 4px;"></i>
-                            更详细的分析数据请访问 Netlify Analytics 面板
+                            更详细的分析数据请访问 Supabase Analytics 面板
                         </p>
                     </div>
                 </div>
@@ -1465,37 +1642,31 @@
         }
 
         // 初始化Decap CMS
+        // Decap CMS 自动初始化，无需手动调用
+        // 只需要确保 #nc-root 元素存在，CMS 会自动挂载
+
         function initDecapCMS() {
+            console.log('Decap CMS 挂载点已就绪，等待自动初始化...');
+
+            // Decap CMS 会自动检测 #nc-root 并初始化
+            // 如果需要自定义配置，可以通过 window.CMS_CONFIG 设置
+
+            // 监听 CMS 初始化完成事件
             if (window.CMS) {
-                try {
-                    // 初始化CMS
-                    cmsInstance = window.CMS.init();
-                    
-                    // 监听CMS事件
-                    window.CMS.registerEventListener({
-                        type: 'preSave',
-                        handler: ({ entry }) => {
-                            console.log('保存前:', entry);
-                            return entry;
-                        }
-                    });
-                    
-                    window.CMS.registerEventListener({
-                        type: 'postSave',
-                        handler: ({ entry }) => {
-                            showNotification('success', '保存成功', '内容已成功保存');
-                            console.log('保存后:', entry);
-                        }
-                    });
-                    
-                    console.log('Decap CMS初始化成功');
-                } catch (error) {
-                    console.error('Decap CMS初始化失败:', error);
-                    showNotification('error', 'CMS错误', '内容管理系统初始化失败');
-                }
+                window.CMS.on('init', () => {
+                    console.log('Decap CMS 初始化成功');
+                });
+
+                // 监听保存事件
+                window.CMS.registerEventListener({
+                    type: 'postSave',
+                    handler: ({ entry }) => {
+                        showNotification('success', '保存成功', '内容已成功保存到 GitHub');
+                        console.log('保存后:', entry);
+                    }
+                });
             } else {
-                console.error('Decap CMS未加载');
-                showNotification('error', 'CMS错误', '内容管理系统未加载，请检查网络连接');
+                console.warn('Decap CMS 未检测到，将使用备用方案');
             }
         }
 
@@ -1543,8 +1714,41 @@
             });
 
             document.getElementById('logoutBtn').addEventListener('click', async function() {
-                if (confirm('确定要退出登录吗？')) {
-                    await window.supabase.auth.signOut();
+                if (!confirm('确定要退出登录吗？')) return;
+                
+                try {
+                    // 首选：使用全局supabaseClient
+                    if (supabaseClient && supabaseClient.auth) {
+                        const { error } = await supabaseClient.auth.signOut();
+                        if (error) throw error;
+                    }
+                    // 备用方案：尝试使用 SupabaseService
+                    else if (window.supabaseService && window.supabaseService.supabase) {
+                        const { error } = await window.supabaseService.supabase.auth.signOut();
+                        if (error) throw error;
+                    } 
+                    // 备用方案：直接使用 window.supabase（如果可用）
+                    else if (window.supabase && window.supabase.auth) {
+                        const { error } = await window.supabase.auth.signOut();
+                        if (error) throw error;
+                    } 
+                    // 如果都没有，显示错误
+                    else {
+                        throw new Error('认证服务未初始化');
+                    }
+                    
+                    showNotification('success', '已退出', '正在跳转到登录页面...');
+                    setTimeout(() => {
+                        window.location.href = '/admin/login-supabase.html';
+                    }, 1500);
+                } catch (error) {
+                    console.error('退出失败:', error);
+                    showNotification('error', '退出失败', error.message);
+                    
+                    // 如果退出失败，仍然跳转到登录页面
+                    setTimeout(() => {
+                        window.location.href = '/admin/login-supabase.html';
+                    }, 2000);
                 }
             });
 

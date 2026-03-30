@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>内容管理 - CreatorHub 管理后台</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .content-management {
+            padding: 32px;
+        }
+        
+        .management-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+        
+        .section-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        
+        .btn-primary {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary:hover {
+            background: #4338ca;
+        }
+        
+        .tabs {
+            display: flex;
+            background: white;
+            border-radius: 12px;
+            padding: 8px;
+            margin-bottom: 32px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 16px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn.active {
+            background: #4f46e5;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .content-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        
+        .content-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-image {
+            height: 180px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 48px;
+        }
+        
+        .card-content {
+            padding: 20px;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+        
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            font-size: 12px;
+            color: #64748b;
+        }
+        
+        .card-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        
+        .tag {
+            background: #eef2ff;
+            color: #4f46e5;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn-action {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-edit {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        
+        .btn-edit:hover {
+            background: #bfdbfe;
+        }
+        
+        .btn-delete {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+        
+        .btn-delete:hover {
+            background: #fecaca;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 24px 32px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #94a3b8;
+        }
+        
+        .modal-body {
+            padding: 24px 32px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .tag-input {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+        }
+        
+        .tag-input input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 14px;
+        }
+        
+        .existing-tag {
+            background: #eef2ff;
+            color: #4f46e5;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .tag-remove {
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .modal-footer {
+            padding: 16px 32px 24px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        .btn-cancel {
+            background: #f1f5f9;
+            color: #64748b;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .btn-save {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 64px 32px;
+            color: #64748b;
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+        
+        .empty-state-text {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        
+        .empty-state-subtext {
+            font-size: 14px;
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top-color: #4f46e5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- 侧边栏和顶部栏保持不变 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>CreatorHub</h2>
+                <p>内容管理后台</p>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-item" data-page="dashboard">
+                    <i>📊</i>
+                    <span>仪表盘</span>
+                </div>
+                <div class="nav-item active" data-page="content">
+                    <i>📝</i>
+                    <span>内容管理</span>
+                </div>
+                <div class="nav-item" data-page="media">
+                    <i>🖼️</i>
+                    <span>媒体库</span>
+                </div>
+                <div class="nav-item" data-page="users">
+                    <i>👥</i>
+                    <span>用户管理</span>
+                </div>
+                <div class="nav-item" data-page="settings">
+                    <i>⚙️</i>
+                    <span>系统设置</span>
+                </div>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <header class="top-bar">
+                <h1>内容管理</h1>
+                <div class="user-info">
+                    <div class="user-details">
+                        <div class="user-name" id="userName">管理员</div>
+                        <div class="user-email" id="userEmail">-</div>
+                    </div>
+                    <div class="user-avatar" id="userAvatar">?</div>
+                    <button class="logout-btn" id="logoutBtn">退出</button>
+                </div>
+            </header>
+            
+            <div class="content-area">
+                <div class="content-management">
+                    <div class="management-header">
+                        <h2 class="section-title">内容管理中心</h2>
+                        <button class="btn-primary" onclick="openCreateModal()">
+                            <span>➕</span>
+                            <span>新建内容</span>
+                        </button>
+                    </div>
+                    
+                    <div class="tabs">
+                        <button class="tab-btn active" data-tab="articles">文章管理</button>
+                        <button class="tab-btn" data-tab="works">作品管理</button>
+                        <button class="tab-btn" data-tab="pages">页面管理</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="articlesTab">
+                        <div class="content-grid" id="articlesGrid">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="worksTab">
+                        <div class="content-grid" id="worksGrid">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="pagesTab">
+                        <div class="content-grid" id="pagesGrid">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- 创建/编辑内容模态框 -->
+    <div class="modal" id="contentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">新建内容</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="contentForm">
+                    <input type="hidden" id="contentId">
+                    
+                    <div class="form-group">
+                        <label for="contentType">内容类型</label>
+                        <select class="form-control" id="contentType" required>
+                            <option value="">请选择内容类型</option>
+                            <option value="article">文章</option>
+                            <option value="work">作品</option>
+                            <option value="page">页面</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contentTitle">标题</label>
+                        <input type="text" class="form-control" id="contentTitle" placeholder="请输入标题" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contentSlug">URL别名</label>
+                        <input type="text" class="form-control" id="contentSlug" placeholder="用于生成URL，如：my-article">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contentExcerpt">摘要</label>
+                        <textarea class="form-control form-textarea" id="contentExcerpt" placeholder="简短的内容摘要"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contentImage">封面图片URL</label>
+                        <input type="url" class="form-control" id="contentImage" placeholder="https://example.com/image.jpg">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contentTags">标签</label>
+                        <div class="tag-input">
+                            <div id="tagContainer"></div>
+                            <input type="text" id="tagInput" placeholder="输入标签后按回车添加">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contentCategory">分类</label>
+                        <select class="form-control" id="contentCategory">
+                            <option value="">请选择分类</option>
+                            <option value="video">视频创作</option>
+                            <option value="photo">摄影作品</option>
+                            <option value="writing">文案写作</option>
+                            <option value="tutorial">教程分享</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contentBody">正文内容</label>
+                        <textarea class="form-control form-textarea" id="contentBody" placeholder="支持Markdown语法"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="contentPublished"> 立即发布
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal()">取消</button>
+                <button class="btn-save" onclick="saveContent()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://img.jsdelivr.net/npm/@cloudbase/js-sdk@2.4.1/dist/cloudbase.full.js"></script>
+    <script>
+        // 初始化 CloudBase
+        const app = cloudbase.init({
+            env: 'gyfish-4gbxsy3dc619f1e8',
+            region: 'ap-guangzhou'
+        });
+        const auth = app.auth();
+        const db = app.database();
+
+        // 全局变量
+        let currentContent = null;
+        let currentTags = [];
+
+        // DOM 元素
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const contentGrids = {
+            articles: document.getElementById('articlesGrid'),
+            works: document.getElementById('worksGrid'),
+            pages: document.getElementById('pagesGrid')
+        };
+
+        // Tab 切换
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.dataset.tab;
+                
+                // 更新按钮状态
+                tabBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // 更新内容显示
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(`${tabId}Tab`).classList.add('active');
+                
+                // 加载对应内容
+                loadContent(tabId);
+            });
+        });
+
+        // 标签管理
+        document.getElementById('tagInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const tag = this.value.trim();
+                if (tag && !currentTags.includes(tag)) {
+                    addTag(tag);
+                    this.value = '';
+                }
+            }
+        });
+
+        function addTag(tag) {
+            currentTags.push(tag);
+            renderTags();
+        }
+
+        function removeTag(tag) {
+            currentTags = currentTags.filter(t => t !== tag);
+            renderTags();
+        }
+
+        function renderTags() {
+            const container = document.getElementById('tagContainer');
+            container.innerHTML = currentTags.map(tag => `
+                <span class="existing-tag">
+                    ${tag}
+                    <span class="tag-remove" onclick="removeTag('${tag}')">×</span>
+                </span>
+            `).join('');
+        }
+
+        // 模态框操作
+        function openCreateModal() {
+            currentContent = null;
+            currentTags = [];
+            document.getElementById('modalTitle').textContent = '新建内容';
+            document.getElementById('contentForm').reset();
+            renderTags();
+            document.getElementById('contentModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('contentModal').classList.remove('show');
+        }
+
+        // 编辑内容
+        function editContent(id) {
+            // 这里应该从数据库获取内容数据
+            console.log('编辑内容:', id);
+        }
+
+        // 删除内容
+        function deleteContent(id) {
+            if (confirm('确定要删除这个内容吗？')) {
+                console.log('删除内容:', id);
+                // 这里应该调用删除API
+            }
+        }
+
+        // 保存内容
+        async function saveContent() {
+            const form = document.getElementById('contentForm');
+            const formData = new FormData(form);
+            
+            const contentData = {
+                type: document.getElementById('contentType').value,
+                title: document.getElementById('contentTitle').value,
+                slug: document.getElementById('contentSlug').value,
+                excerpt: document.getElementById('contentExcerpt').value,
+                image: document.getElementById('contentImage').value,
+                tags: currentTags,
+                category: document.getElementById('contentCategory').value,
+                body: document.getElementById('contentBody').value,
+                published: document.getElementById('contentPublished').checked,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            
+            try {
+                // 这里应该调用保存API
+                console.log('保存内容:', contentData);
+                alert('内容保存成功！');
+                closeModal();
+                refreshCurrentTab();
+            } catch (error) {
+                console.error('保存失败:', error);
+                alert('保存失败：' + error.message);
+            }
+        }
+
+        // 加载内容
+        async function loadContent(type) {
+            const grid = contentGrids[type];
+            grid.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+            
+            try {
+                // 模拟数据
+                const mockData = getMockData(type);
+                
+                if (mockData.length === 0) {
+                    grid.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <div class="empty-state-text">暂无内容</div>
+                            <div class="empty-state-subtext">点击"新建内容"按钮创建第一个${getTypeName(type)}</div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                grid.innerHTML = mockData.map(item => `
+                    <div class="content-card">
+                        <div class="card-image">${item.icon}</div>
+                        <div class="card-content">
+                            <h3 class="card-title">${item.title}</h3>
+                            <div class="card-meta">
+                                <span>${item.date}</span>
+                                <span>${item.status}</span>
+                            </div>
+                            <div class="card-tags">
+                                ${item.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn-action btn-edit" onclick="editContent('${item.id}')">编辑</button>
+                                <button class="btn-action btn-delete" onclick="deleteContent('${item.id}')">删除</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('加载内容失败:', error);
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">❌</div>
+                        <div class="empty-state-text">加载失败</div>
+                        <div class="empty-state-subtext">请刷新页面重试</div>
+                    </div>
+                `;
+            }
+        }
+
+        // 获取模拟数据
+        function getMockData(type) {
+            const data = {
+                articles: [
+                    {
+                        id: '1',
+                        title: '5个让你的视频更专业的剪辑技巧',
+                        icon: '🎬',
+                        date: '2024-03-15',
+                        status: '已发布',
+                        tags: ['剪辑', '技巧', '视频']
+                    },
+                    {
+                        id: '2',
+                        title: '如何写出让人忍不住转发的文案',
+                        icon: '✍️',
+                        date: '2024-03-10',
+                        status: '草稿',
+                        tags: ['文案', '营销', '写作']
+                    }
+                ],
+                works: [
+                    {
+                        id: '3',
+                        title: '城市风光延时摄影',
+                        icon: '🌆',
+                        date: '2024-03-05',
+                        status: '已发布',
+                        tags: ['摄影', '风光', '延时']
+                    },
+                    {
+                        id: '4',
+                        title: '品牌形象宣传片',
+                        icon: '🎥',
+                        date: '2024-02-28',
+                        status: '已发布',
+                        tags: ['视频', '品牌', '宣传']
+                    }
+                ],
+                pages: [
+                    {
+                        id: '5',
+                        title: '关于我们',
+                        icon: '👤',
+                        date: '2024-01-15',
+                        status: '已发布',
+                        tags: ['页面', '介绍']
+                    }
+                ]
+            };
+            return data[type] || [];
+        }
+
+        function getTypeName(type) {
+            const names = {
+                articles: '文章',
+                works: '作品',
+                pages: '页面'
+            };
+            return names[type] || '内容';
+        }
+
+        function refreshCurrentTab() {
+            const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
+            loadContent(activeTab);
+        }
+
+        // 页面初始化
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // 检查认证状态
+                const authState = await auth.getAuthState();
+                if (!authState || !authState.user) {
+                    window.location.href = './unified-login.html';
+                    return;
+                }
+                
+                // 初始化标签系统
+                renderTags();
+                
+                // 加载默认内容（文章）
+                loadContent('articles');
+                
+            } catch (error) {
+                console.error('初始化失败:', error);
+                window.location.href = './unified-login.html';
+            }
+        });
+
+        // 导航功能保持一致
+        document.querySelectorAll('.nav-item[data-page]').forEach(item => {
+            item.addEventListener('click', () => {
+                const page = item.dataset.page;
+                if (page !== 'content') {
+                    window.location.href = `${page}.html`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

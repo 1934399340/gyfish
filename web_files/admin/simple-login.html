@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员登录 - CreatorHub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .login-btn:active {
+            transform: translateY(0);
+        }
+        
+        .login-btn.loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        .login-btn.loading .spinner {
+            display: inline-block;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 12px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .message.show {
+            display: block;
+        }
+        
+        .error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #dc2626;
+        }
+        
+        .success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #059669;
+        }
+        
+        .info {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #2563eb;
+        }
+        
+        .forgot-password {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+        
+        .github-login {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid #e1e5e9;
+        }
+        
+        .github-btn {
+            width: 100%;
+            padding: 14px;
+            background: #24292e;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .github-btn:hover {
+            background: #000;
+            transform: translateY(-2px);
+        }
+        
+        .footer {
+            margin-top: 30px;
+            color: #888;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">CH</div>
+        <h1>管理员登录</h1>
+        <p class="subtitle">CreatorHub 内容管理系统</p>
+        
+        <div id="errorMessage" class="message error"></div>
+        <div id="successMessage" class="message success"></div>
+        <div id="infoMessage" class="message info"></div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">用户名</label>
+                <input type="text" id="username" name="username" required autocomplete="username">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" name="password" required autocomplete="current-password">
+            </div>
+            
+            <button type="submit" class="login-btn" id="loginBtn">
+                <span class="spinner"></span>
+                <span id="loginText">登录</span>
+            </button>
+        </form>
+        
+        <a href="#" class="forgot-password">忘记密码？</a>
+        
+        <div class="github-login">
+            <button class="github-btn" id="githubLoginBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+                使用 GitHub 登录
+            </button>
+        </div>
+        
+        <div class="footer">
+            <p>默认账号: admin / admin</p>
+            <p>© 2026 CreatorHub</p>
+        </div>
+    </div>
+
+    <script>
+        // DOM 元素
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginText = document.getElementById('loginText');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const infoMessage = document.getElementById('infoMessage');
+        const githubLoginBtn = document.getElementById('githubLoginBtn');
+        
+        // 默认管理员账户
+        const DEFAULT_ADMIN = {
+            username: 'admin',
+            password: 'admin'
+        };
+        
+        // 显示消息
+        function showMessage(type, message) {
+            // 隐藏所有消息
+            errorMessage.classList.remove('show');
+            successMessage.classList.remove('show');
+            infoMessage.classList.remove('show');
+            
+            // 显示指定消息
+            const messageElements = {
+                'error': errorMessage,
+                'success': successMessage,
+                'info': infoMessage
+            };
+            
+            if (messageElements[type]) {
+                messageElements[type].textContent = message;
+                messageElements[type].classList.add('show');
+            }
+        }
+        
+        // 设置加载状态
+        function setLoading(loading) {
+            if (loading) {
+                loginBtn.classList.add('loading');
+                loginText.textContent = '登录中...';
+                loginBtn.disabled = true;
+            } else {
+                loginBtn.classList.remove('loading');
+                loginText.textContent = '登录';
+                loginBtn.disabled = false;
+            }
+        }
+        
+        // 简单的密码哈希（实际项目中应使用更安全的方法）
+        function hashPassword(password) {
+            // 这里使用简单的哈希，实际应该使用 bcrypt 等安全算法
+            let hash = 0;
+            for (let i = 0; i < password.length; i++) {
+                const char = password.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // 转换为32位整数
+            }
+            return Math.abs(hash).toString();
+        }
+        
+        // 验证登录
+        function validateLogin(username, password) {
+            // 检查默认账户
+            if (username === DEFAULT_ADMIN.username && password === DEFAULT_ADMIN.password) {
+                return {
+                    success: true,
+                    user: {
+                        username: DEFAULT_ADMIN.username,
+                        role: 'administrator',
+                        name: '管理员'
+                    }
+                };
+            }
+            
+            // 这里可以添加更多用户验证逻辑
+            // 比如从数据库或localStorage读取用户信息
+            
+            return {
+                success: false,
+                error: '用户名或密码错误'
+            };
+        }
+        
+        // 保存用户会话
+        function saveSession(user) {
+            const sessionData = {
+                user: user,
+                timestamp: Date.now(),
+                expires: Date.now() + (30 * 60 * 1000) // 30分钟过期
+            };
+            
+            localStorage.setItem('admin_session', JSON.stringify(sessionData));
+            sessionStorage.setItem('admin_authenticated', 'true');
+        }
+        
+        // 检查会话是否有效
+        function isSessionValid() {
+            const sessionStr = localStorage.getItem('admin_session');
+            if (!sessionStr) return false;
+            
+            try {
+                const session = JSON.parse(sessionStr);
+                return Date.now() < session.expires;
+            } catch (e) {
+                return false;
+            }
+        }
+        
+        // GitHub登录处理
+        async function handleGitHubLogin() {
+            showMessage('info', '正在跳转到GitHub...');
+            
+            try {
+                // 这里应该调用GitHub OAuth流程
+                // 为了简化，我们直接模拟成功登录
+                const fakeUserInfo = {
+                    username: 'github_user',
+                    name: 'GitHub 用户',
+                    role: 'administrator'
+                };
+                
+                saveSession(fakeUserInfo);
+                showMessage('success', 'GitHub登录成功！');
+                
+                setTimeout(() => {
+                    window.location.href = './dashboard.html';
+                }, 1500);
+                
+            } catch (error) {
+                console.error('GitHub登录错误:', error);
+                showMessage('error', 'GitHub登录失败，请稍后重试');
+            }
+        }
+        
+        // 表单提交处理
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                showMessage('error', '请输入用户名和密码');
+                return;
+            }
+            
+            setLoading(true);
+            showMessage('info', '正在验证登录信息...');
+            
+            try {
+                // 模拟网络延迟
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
+                const result = validateLogin(username, password);
+                
+                if (result.success) {
+                    saveSession(result.user);
+                    showMessage('success', `欢迎回来，${result.user.name}！`);
+                    
+                    // 延迟跳转
+                    setTimeout(() => {
+                        window.location.href = './dashboard.html';
+                    }, 1500);
+                } else {
+                    showMessage('error', result.error);
+                }
+            } catch (error) {
+                console.error('登录错误:', error);
+                showMessage('error', '登录过程中出现错误，请稍后重试');
+            } finally {
+                setLoading(false);
+            }
+        });
+        
+        // GitHub登录按钮事件
+        githubLoginBtn.addEventListener('click', handleGitHubLogin);
+        
+        // 页面加载检查
+        document.addEventListener('DOMContentLoaded', () => {
+            // 如果已有有效会话，直接跳转
+            if (isSessionValid()) {
+                window.location.href = './dashboard.html';
+                return;
+            }
+            
+            showMessage('info', '请输入管理员账号登录');
+            
+            // 自动聚焦用户名输入框
+            document.getElementById('username').focus();
+        });
+        
+        // 输入时清除错误消息
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', () => {
+                errorMessage.classList.remove('show');
+            });
+        });
+    </script>
+</body>
+</html>

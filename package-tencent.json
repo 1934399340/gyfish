@@ -1,0 +1,13 @@
+{
+  "name": "creatorhub-tencent",
+  "version": "1.0.0",
+  "description": "CreatorHub personal website for Tencent Cloud deployment",
+  "scripts": {
+    "deploy:tencent": "cloudbase framework deploy",
+    "deploy:preview": "cloudbase hosting:upload ./ / --envId your-env-id",
+    "build": "echo 'Static site, no build required'"
+  },
+  "devDependencies": {
+    "@cloudbase/cli": "^2.4.8"
+  }
+}

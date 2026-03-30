@@ -1,0 +1,16 @@
+{
+  "test": {
+    "local": "http-server . -p 8080",
+    "tencent": "cloudbase hosting:upload ./ / --envId your-env-id",
+    "preview": "cloudbase hosting:upload ./ / --envId your-env-id --mode preview"
+  },
+  "verify": {
+    "links": "node scripts/verify-links.js",
+    "performance": "lighthouse https://your-domain.com --output=json --output-path=./report.json",
+    "mobile": "chrome --user-agent='Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X)'"
+  },
+  "monitor": {
+    "uptime": "curl -f https://your-domain.com > /dev/null || echo 'Site down!'",
+    "ssl": "openssl s_client -connect your-domain.com:443 -servername your-domain.com"
+  }
+}

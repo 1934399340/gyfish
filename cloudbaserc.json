@@ -1,0 +1,49 @@
+{
+  "envId": "gyfish-4gbxsy3dc619f1e8",
+  "version": "2.0",
+  "$schema": "https://framework-1258016615.tcloudbaseapp.com/schema/latest.json",
+  "framework": {
+    "name": "creatorhub",
+    "plugins": {
+      "client": {
+        "use": "@cloudbase/framework-plugin-website",
+        "inputs": {
+          "buildCommand": "",
+          "outputPath": "./",
+          "cloudPath": "/",
+          "ignore": [
+            "node_modules",
+            ".git",
+            ".env",
+            "cloudbaserc.json",
+            "README.md"
+          ]
+        }
+      },
+      "functions": {
+        "use": "@cloudbase/framework-plugin-function",
+        "inputs": {
+          "functionRootPath": "./functions",
+          "functions": [
+            {
+              "name": "github-auth",
+              "timeout": 15,
+              "runtime": "Nodejs18.15",
+              "memorySize": 256,
+              "handler": "index.main",
+              "installDependency": true
+            },
+            {
+              "name": "send-email",
+              "timeout": 15,
+              "runtime": "Nodejs18.15",
+              "memorySize": 256,
+              "handler": "index.main",
+              "installDependency": true
+            }
+          ]
+        }
+      }
+    }
+  }
+}

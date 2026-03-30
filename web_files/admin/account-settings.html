@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>账户设置 - CreatorHub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .message.show {
+            display: block;
+        }
+        
+        .success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #059669;
+        }
+        
+        .error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #dc2626;
+        }
+        
+        .info {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #2563eb;
+        }
+        
+        .current-user {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #e1e5e9;
+        }
+        
+        .user-info {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .user-details h3 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .user-details p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+        
+        .nav-btn {
+            padding: 10px 20px;
+            background: #f8f9fa;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #555;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👤 账户设置</h1>
+            <p>管理您的管理员账户信息</p>
+        </div>
+        
+        <div class="content">
+            <div id="messageArea"></div>
+            
+            <div class="current-user">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div class="user-details">
+                        <h3 id="userName">管理员</h3>
+                        <p id="userRole">Administrator</p>
+                        <p>上次登录: <span id="lastLogin">今天</span></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2 class="section-title">🔑 修改登录凭证</h2>
+                
+                <form id="credentialsForm">
+                    <div class="form-group">
+                        <label for="currentUsername">当前用户名</label>
+                        <input type="text" id="currentUsername" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="newUsername">新用户名</label>
+                        <input type="text" id="newUsername" placeholder="输入新的用户名">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="currentPassword">当前密码</label>
+                        <input type="password" id="currentPassword" placeholder="输入当前密码">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="newPassword">新密码</label>
+                        <input type="password" id="newPassword" placeholder="输入新的密码">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirmPassword">确认新密码</label>
+                        <input type="password" id="confirmPassword" placeholder="再次输入新密码">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">保存更改</button>
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">重置</button>
+                </form>
+            </div>
+            
+            <div class="section">
+                <h2 class="section-title">⚙️ 其他设置</h2>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="enableGithubLogin"> 启用 GitHub 登录
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="enableTwoFactor"> 启用双重验证
+                    </label>
+                </div>
+                
+                <button class="btn btn-primary" onclick="saveSettings()">保存设置</button>
+            </div>
+            
+            <div class="nav-buttons">
+                <a href="./dashboard.html" class="nav-btn">返回仪表板</a>
+                <a href="./simple-login.html" class="nav-btn">退出登录</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 获取当前用户信息
+        function getCurrentUser() {
+            const sessionStr = localStorage.getItem('admin_session');
+            if (sessionStr) {
+                try {
+                    const session = JSON.parse(sessionStr);
+                    return session.user;
+                } catch (e) {
+                    return null;
+                }
+            }
+            return null;
+        }
+        
+        // 显示消息
+        function showMessage(type, message) {
+            const messageArea = document.getElementById('messageArea');
+            messageArea.innerHTML = `<div class="message ${type} show">${message}</div>`;
+            
+            // 3秒后自动隐藏
+            setTimeout(() => {
+                messageArea.innerHTML = '';
+            }, 3000);
+        }
+        
+        // 更新用户显示信息
+        function updateUserInfo() {
+            const user = getCurrentUser();
+            if (user) {
+                document.getElementById('userName').textContent = user.name || user.username;
+                document.getElementById('userRole').textContent = user.role || 'Administrator';
+                document.getElementById('currentUsername').value = user.username;
+                document.getElementById('userAvatar').textContent = (user.name || user.username).charAt(0).toUpperCase();
+            }
+        }
+        
+        // 验证表单
+        function validateForm() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const newUsername = document.getElementById('newUsername').value;
+            
+            // 检查当前密码（简单验证）
+            if (currentPassword !== 'admin') {
+                showMessage('error', '当前密码不正确');
+                return false;
+            }
+            
+            // 检查新密码
+            if (newPassword && newPassword.length < 4) {
+                showMessage('error', '新密码至少需要4个字符');
+                return false;
+            }
+            
+            // 检查密码确认
+            if (newPassword && newPassword !== confirmPassword) {
+                showMessage('error', '两次输入的新密码不一致');
+                return false;
+            }
+            
+            // 检查用户名
+            if (newUsername && newUsername.length < 2) {
+                showMessage('error', '用户名至少需要2个字符');
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // 保存凭证更改
+        function saveCredentials() {
+            const newUsername = document.getElementById('newUsername').value.trim();
+            const newPassword = document.getElementById('newPassword').value;
+            
+            // 获取当前会话
+            const sessionStr = localStorage.getItem('admin_session');
+            if (!sessionStr) {
+                showMessage('error', '会话已过期，请重新登录');
+                return;
+            }
+            
+            try {
+                const session = JSON.parse(sessionStr);
+                const user = session.user;
+                
+                // 更新用户信息
+                if (newUsername) {
+                    user.username = newUsername;
+                    user.name = newUsername;
+                }
+                
+                // 保存到localStorage（实际项目中应该保存到服务器）
+                const userData = {
+                    username: user.username,
+                    password: newPassword || 'admin', // 简化处理
+                    name: user.name,
+                    role: user.role
+                };
+                
+                localStorage.setItem('admin_user_data', JSON.stringify(userData));
+                
+                // 更新会话
+                session.user = user;
+                localStorage.setItem('admin_session', JSON.stringify(session));
+                
+                showMessage('success', '账户信息更新成功！');
+                
+                // 更新显示
+                updateUserInfo();
+                resetForm();
+                
+            } catch (error) {
+                console.error('保存失败:', error);
+                showMessage('error', '保存失败，请稍后重试');
+            }
+        }
+        
+        // 重置表单
+        function resetForm() {
+            document.getElementById('credentialsForm').reset();
+            document.getElementById('newUsername').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            document.getElementById('currentPassword').value = '';
+        }
+        
+        // 保存其他设置
+        function saveSettings() {
+            const settings = {
+                enableGithubLogin: document.getElementById('enableGithubLogin').checked,
+                enableTwoFactor: document.getElementById('enableTwoFactor').checked
+            };
+            
+            localStorage.setItem('admin_settings', JSON.stringify(settings));
+            showMessage('success', '设置已保存');
+        }
+        
+        // 加载设置
+        function loadSettings() {
+            const settingsStr = localStorage.getItem('admin_settings');
+            if (settingsStr) {
+                try {
+                    const settings = JSON.parse(settingsStr);
+                    document.getElementById('enableGithubLogin').checked = settings.enableGithubLogin || false;
+                    document.getElementById('enableTwoFactor').checked = settings.enableTwoFactor || false;
+                } catch (e) {
+                    // 使用默认值
+                }
+            }
+        }
+        
+        // 页面加载
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = getCurrentUser();
+            if (!user) {
+                window.location.href = './simple-login.html';
+                return;
+            }
+            
+            updateUserInfo();
+            loadSettings();
+            showMessage('info', '欢迎来到账户设置页面');
+        });
+        
+        // 表单提交
+        document.getElementById('credentialsForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            if (validateForm()) {
+                saveCredentials();
+            }
+        });
+    </script>
+</body>
+</html>

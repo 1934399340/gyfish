@@ -1,0 +1,19 @@
+{
+  "envId": "gyfish-4gbxsy3dc619f1e8",
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      ".git/**",
+      "node_modules/**",
+      "*.log",
+      "*.md",
+      "cloudbaserc.json",
+      "package-tencent.json",
+      "deploy*.bat",
+      "cloudbase-framework/**",
+      "logs/**",
+      ".DS_Store",
+      "Thumbs.db"
+    ]
+  }
+}

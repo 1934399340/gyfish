@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试后台管理系统</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #45a049;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>后台管理系统功能测试</h1>
+        
+        <div class="test-section">
+            <h3>1. 文件路径测试</h3>
+            <button class="test-button" onclick="testFilePaths()">测试JSON文件路径</button>
+            <div id="filePathResult" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>2. 后台管理系统链接</h3>
+            <p>点击以下链接打开完整的后台管理系统：</p>
+            <a href="admin-system.html" target="_blank" style="display: inline-block; background: #2196F3; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; margin: 10px 0;">打开后台管理系统</a>
+            <p>或者查看演示页面：</p>
+            <a href="admin-demo.html" target="_blank" style="display: inline-block; background: #9C27B0; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; margin: 10px 0;">查看演示页面</a>
+        </div>
+        
+        <div class="test-section">
+            <h3>3. 现有文件检查</h3>
+            <button class="test-button" onclick="listFiles()">列出content目录文件</button>
+            <div id="fileListResult" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>4. 功能说明</h3>
+            <p>后台管理系统包含以下功能：</p>
+            <ul>
+                <li><strong>仪表盘</strong>：显示网站统计数据</li>
+                <li><strong>网站设置</strong>：管理网站基本信息</li>
+                <li><strong>作品集管理</strong>：添加、编辑、删除作品</li>
+                <li><strong>文章管理</strong>：管理文案技巧和案例文章</li>
+                <li><strong>响应式设计</strong>：适配手机和桌面设备</li>
+                <li><strong>实时通知</strong>：操作反馈和状态提示</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        async function testFilePaths() {
+            const resultDiv = document.getElementById('filePathResult');
+            resultDiv.innerHTML = '测试中...';
+            
+            const files = [
+                'content/settings/general.json',
+                'content/portfolio/city-timelapse.json',
+                'content/posts/viral-copywriting.json'
+            ];
+            
+            let results = [];
+            
+            for (const file of files) {
+                try {
+                    const response = await fetch(file);
+                    if (response.ok) {
+                        const data = await response.json();
+                        results.push(`<span class="success">✓ ${file} - 加载成功</span>`);
+                    } else {
+                        results.push(`<span class="error">✗ ${file} - 加载失败 (${response.status})</span>`);
+                    }
+                } catch (error) {
+                    results.push(`<span class="error">✗ ${file} - 错误: ${error.message}</span>`);
+                }
+            }
+            
+            resultDiv.innerHTML = results.join('<br>');
+        }
+        
+        async function listFiles() {
+            const resultDiv = document.getElementById('fileListResult');
+            resultDiv.innerHTML = '获取文件列表中...';
+            
+            // 由于安全限制，我们无法直接列出目录
+            // 但我们可以测试已知文件
+            const knownFiles = [
+                'content/settings/general.json',
+                'content/portfolio/city-timelapse.json',
+                'content/posts/viral-copywriting.json',
+                'admin-system.html',
+                'admin-demo.html',
+                'index.html',
+                'portfolio.html'
+            ];
+            
+            let results = [];
+            
+            for (const file of knownFiles) {
+                try {
+                    const response = await fetch(file, { method: 'HEAD' });
+                    if (response.ok) {
+                        results.push(`<span class="success">✓ ${file}</span>`);
+                    } else {
+                        results.push(`<span class="error">✗ ${file} - 不存在</span>`);
+                    }
+                } catch (error) {
+                    results.push(`<span class="error">✗ ${file} - 检查失败</span>`);
+                }
+            }
+            
+            resultDiv.innerHTML = results.join('<br>');
+        }
+        
+        // 页面加载时自动测试文件路径
+        window.onload = function() {
+            testFilePaths();
+            listFiles();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "version": "1.0",
+  "envId": "your-env-id",
+  "region": "ap-shanghai",
+  "staticHosting": {
+    "enable": true,
+    "sourceDir": "./",
+    "targetDir": "/",
+    "ignore": [
+      "node_modules/**",
+      ".git/**",
+      "*.md",
+      "cloudbaserc.json",
+      "package-tencent.json"
+    ]
+  },
+  "functions": {},
+  "databases": [],
+  "storage": []
+}

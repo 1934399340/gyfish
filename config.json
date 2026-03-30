@@ -1,7 +1,7 @@
 {
   "supabaseUrl": "https://twfihaxptmhvdnapfovc.supabase.co",
   "supabaseAnonKey": "sb_publishable_IFWl0r0vz0m5Vr4_Gk5w-A_xG9lGTYj",
-  "supabaseServiceKey": "",
+  "supabaseServiceKey": "sb_secret_kNaIZgFqrhqVbR9ndx1WxA_ylM75o4L",
   "cloudinaryCloudName": "dkkdxs71w",
   "cloudinaryApiKey": "514869353111661",
   "cloudinaryApiSecret": "VN0JoS2_CWENuee7mKBpun2T4qQ"

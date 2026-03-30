@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const contactForm = document.getElementById('contactForm');
     const RATE_LIMIT_KEY = 'contact_form_last_submit';
     const RATE_LIMIT_SECONDS = 60;
-    const API_URL = '/api/send-email';
+    const API_URL = 'https://gyfish-4gbxsy3dc619f1e8.service.tcloudbase.com/send-email';
 
     function getLastSubmitTime() {
         const lastTime = localStorage.getItem(RATE_LIMIT_KEY);

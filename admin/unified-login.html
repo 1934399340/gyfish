@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>统一登录 - CreatorHub 管理后台</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .login-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 450px;
+            overflow: hidden;
+        }
+        .login-header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 32px 40px;
+            text-align: center;
+        }
+        .login-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .login-header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .login-tabs {
+            display: flex;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 16px;
+            background: transparent;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active {
+            color: #4f46e5;
+            background: white;
+            border-bottom: 3px solid #4f46e5;
+        }
+        .tab-content {
+            padding: 40px;
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 24px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        .btn-login {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+        }
+        .btn-login:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+        .message.show {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .message.error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+        }
+        .message.success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #16a34a;
+        }
+        .github-login {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 16px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        .github-login:hover {
+            background: #444;
+            transform: translateY(-2px);
+        }
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 24px 0;
+        }
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e5e7eb;
+        }
+        .divider span {
+            padding: 0 16px;
+            color: #9ca3af;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-page">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>🔐 管理员登录</h1>
+                <p>CreatorHub 内容管理后台</p>
+            </div>
+            
+            <div class="login-tabs">
+                <button class="tab-btn active" data-tab="email">邮箱登录</button>
+                <button class="tab-btn" data-tab="github">GitHub登录</button>
+            </div>
+            
+            <div class="tab-content active" id="emailTab">
+                <div class="message error" id="emailError">
+                    <span>⚠️</span>
+                    <span id="emailErrorText"></span>
+                </div>
+                <div class="message success" id="emailSuccess">
+                    <span>✅</span>
+                    <span id="emailSuccessText"></span>
+                </div>
+                
+                <form id="emailLoginForm">
+                    <div class="form-group">
+                        <label for="email">邮箱地址</label>
+                        <input type="email" id="email" name="email" placeholder="请输入管理员邮箱" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">密码</label>
+                        <input type="password" id="password" name="password" placeholder="请输入密码" required>
+                    </div>
+                    <button type="submit" class="btn-login" id="emailLoginBtn">
+                        <span id="emailLoginText">登录</span>
+                        <div class="spinner" id="emailSpinner" style="display: none;"></div>
+                    </button>
+                </form>
+            </div>
+            
+            <div class="tab-content" id="githubTab">
+                <div class="message error" id="githubError">
+                    <span>⚠️</span>
+                    <span id="githubErrorText"></span>
+                </div>
+                <div class="message success" id="githubSuccess">
+                    <span>✅</span>
+                    <span id="githubSuccessText"></span>
+                </div>
+                
+                <button class="github-login" id="githubLoginBtn">
+                    <span>🐙</span>
+                    <span>使用 GitHub 登录</span>
+                </button>
+                
+                <div class="divider">
+                    <span>或</span>
+                </div>
+                
+                <p style="text-align: center; color: #64748b; font-size: 14px; margin-bottom: 20px;">
+                    首次使用 GitHub 登录需要管理员授权
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://img.jsdelivr.net/npm/@cloudbase/js-sdk@2.4.1/dist/cloudbase.full.js"></script>
+    <script>
+        // 初始化 CloudBase
+        const app = cloudbase.init({
+            env: 'gyfish-4gbxsy3dc619f1e8',
+            region: 'ap-guangzhou'
+        });
+        const auth = app.auth();
+
+        // DOM 元素
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const emailForm = document.getElementById('emailLoginForm');
+        const githubLoginBtn = document.getElementById('githubLoginBtn');
+
+        // Tab 切换
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.dataset.tab;
+                
+                // 更新按钮状态
+                tabBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // 更新内容显示
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(`${tabId}Tab`).classList.add('active');
+            });
+        });
+
+        // 邮箱登录功能
+        emailForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                showError('email', '请填写完整信息');
+                return;
+            }
+            
+            try {
+                setLoading('email', true);
+                hideMessage('email');
+                
+                // 执行登录
+                const result = await auth.signInWithEmailAndPassword(email, password);
+                
+                if (result.code) {
+                    throw new Error(result.message);
+                }
+                
+                showMessage('email', 'success', '登录成功！正在跳转...');
+                
+                // 跳转到管理后台
+                setTimeout(() => {
+                    window.location.href = './dashboard.html';
+                }, 1500);
+                
+            } catch (error) {
+                console.error('登录失败:', error);
+                showError('email', error.message || '登录失败');
+                setLoading('email', false);
+            }
+        });
+
+        // GitHub 登录功能
+        githubLoginBtn.addEventListener('click', async () => {
+            try {
+                setLoading('github', true);
+                hideMessage('github');
+                
+                // 使用 OAuth 登录
+                const result = await auth.signInWithGithub();
+                
+                if (result.code) {
+                    throw new Error(result.message);
+                }
+                
+                showMessage('github', 'success', '登录成功！正在跳转...');
+                
+                // 跳转到管理后台
+                setTimeout(() => {
+                    window.location.href = './dashboard.html';
+                }, 1500);
+                
+            } catch (error) {
+                console.error('GitHub 登录失败:', error);
+                showError('github', error.message || 'GitHub 登录失败');
+                setLoading('github', false);
+            }
+        });
+
+        // 辅助函数
+        function setLoading(type, isLoading) {
+            const btn = type === 'email' ? document.getElementById('emailLoginBtn') : githubLoginBtn;
+            const text = type === 'email' ? document.getElementById('emailLoginText') : btn.querySelector('span:last-child');
+            const spinner = type === 'email' ? document.getElementById('emailSpinner') : null;
+            
+            if (isLoading) {
+                btn.disabled = true;
+                text.textContent = type === 'email' ? '登录中...' : '登录中...';
+                if (spinner) spinner.style.display = 'block';
+            } else {
+                btn.disabled = false;
+                text.textContent = type === 'email' ? '登录' : '使用 GitHub 登录';
+                if (spinner) spinner.style.display = 'none';
+            }
+        }
+
+        function showMessage(type, messageType, message) {
+            const element = type === 'email' ? 
+                (messageType === 'error' ? document.getElementById('emailError') : document.getElementById('emailSuccess')) :
+                (messageType === 'error' ? document.getElementById('githubError') : document.getElementById('githubSuccess'));
+            const textElement = type === 'email' ?
+                (messageType === 'error' ? document.getElementById('emailErrorText') : document.getElementById('emailSuccessText')) :
+                (messageType === 'error' ? document.getElementById('githubErrorText') : document.getElementById('githubSuccessText'));
+            
+            textElement.textContent = message;
+            element.classList.add('show');
+            
+            // 3秒后自动隐藏成功消息
+            if (messageType === 'success') {
+                setTimeout(() => {
+                    element.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        function showError(type, message) {
+            showMessage(type, 'error', message);
+        }
+
+        function hideMessage(type) {
+            const errorElement = type === 'email' ? document.getElementById('emailError') : document.getElementById('githubError');
+            const successElement = type === 'email' ? document.getElementById('emailSuccess') : document.getElementById('githubSuccess');
+            
+            errorElement.classList.remove('show');
+            successElement.classList.remove('show');
+        }
+
+        // 检查是否已登录
+        async function checkAuthStatus() {
+            try {
+                const authState = await auth.getAuthState();
+                if (authState && authState.user) {
+                    // 已登录，直接跳转到后台
+                    window.location.href = './dashboard.html';
+                }
+            } catch (error) {
+                console.log('未检测到登录状态');
+            }
+        }
+
+        // 页面加载时检查登录状态
+        document.addEventListener('DOMContentLoaded', checkAuthStatus);
+    </script>
+</body>
+</html>

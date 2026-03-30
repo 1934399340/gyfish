@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>会话调试工具 - CreatorHub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .debug-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 800px;
+            overflow: hidden;
+        }
+        
+        .debug-header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 24px 32px;
+            text-align: center;
+        }
+        
+        .debug-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .debug-header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        .debug-content {
+            padding: 32px;
+        }
+        
+        .section {
+            margin-bottom: 32px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .section-header {
+            background: #f9fafb;
+            padding: 16px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            font-weight: 600;
+            color: #374151;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .section-content {
+            padding: 24px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        
+        .info-item {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .info-label {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        
+        .info-value {
+            font-size: 16px;
+            color: #1e293b;
+            font-weight: 600;
+            word-break: break-all;
+        }
+        
+        .info-value.success {
+            color: #10b981;
+        }
+        
+        .info-value.error {
+            color: #ef4444;
+        }
+        
+        .info-value.warning {
+            color: #f59e0b;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: #4f46e5;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #4338ca;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+        }
+        
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+        }
+        
+        .log-output {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        
+        .log-entry {
+            margin-bottom: 8px;
+            padding-left: 8px;
+            border-left: 3px solid;
+        }
+        
+        .log-entry.info {
+            border-left-color: #3b82f6;
+        }
+        
+        .log-entry.success {
+            border-left-color: #10b981;
+        }
+        
+        .log-entry.warning {
+            border-left-color: #f59e0b;
+        }
+        
+        .log-entry.error {
+            border-left-color: #ef4444;
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .status-active {
+            background: #10b981;
+            color: #10b981;
+        }
+        
+        .status-inactive {
+            background: #ef4444;
+            color: #ef4444;
+        }
+        
+        .status-warning {
+            background: #f59e0b;
+            color: #f59e0b;
+        }
+        
+        .copy-btn {
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+        }
+        
+        .copy-btn:hover {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        
+        @media (max-width: 640px) {
+            .debug-content {
+                padding: 20px;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-container">
+        <div class="debug-header">
+            <h1>Supabase 会话调试工具</h1>
+            <p>诊断登录、会话和认证问题</p>
+        </div>
+        
+        <div class="debug-content">
+            <!-- 会话状态 -->
+            <div class="section">
+                <div class="section-header">
+                    <span>会话状态</span>
+                    <div class="status-indicator" id="sessionStatus">
+                        <span class="status-dot"></span>
+                        <span>检测中...</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Supabase 客户端状态</div>
+                            <div class="info-value" id="supabaseStatus">检测中...</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">当前用户</div>
+                            <div class="info-value" id="currentUser">检测中...</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">会话有效期</div>
+                            <div class="info-value" id="sessionExpiry">检测中...</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">localStorage 状态</div>
+                            <div class="info-value" id="storageStatus">检测中...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 配置信息 -->
+            <div class="section">
+                <div class="section-header">
+                    <span>配置信息</span>
+                    <button class="copy-btn" onclick="copyConfig()">
+                        📋 复制配置
+                    </button>
+                </div>
+                <div class="section-content">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Supabase URL</div>
+                            <div class="info-value" id="supabaseUrl">检测中...</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">当前域名</div>
+                            <div class="info-value" id="currentDomain">检测中...</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">页面路径</div>
+                            <div class="info-value" id="pagePath">检测中...</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">浏览器信息</div>
+                            <div class="info-value" id="browserInfo">检测中...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 操作面板 -->
+            <div class="section">
+                <div class="section-header">
+                    <span>操作面板</span>
+                </div>
+                <div class="section-content">
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="testLogin()">
+                            🔐 测试登录
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearStorage()">
+                            🗑️ 清除存储
+                        </button>
+                        <button class="btn btn-danger" onclick="forceLogout()">
+                            🚪 强制登出
+                        </button>
+                        <button class="btn btn-success" onclick="refreshSession()">
+                            🔄 刷新会话
+                        </button>
+                        <button class="btn btn-secondary" onclick="checkSupabaseConfig()">
+                            ⚙️ 检查配置
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 调试日志 -->
+            <div class="section">
+                <div class="section-header">
+                    <span>调试日志</span>
+                    <button class="copy-btn" onclick="copyLogs()">
+                        📋 复制日志
+                    </button>
+                </div>
+                <div class="section-content">
+                    <div class="log-output" id="logOutput">
+                        [系统] 调试工具已启动...
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 快速链接 -->
+            <div class="section">
+                <div class="section-header">
+                    <span>快速链接</span>
+                </div>
+                <div class="section-content">
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" onclick="window.open('/admin/login-supabase.html', '_blank')">
+                            🔑 登录页面
+                        </button>
+                        <button class="btn btn-secondary" onclick="window.open('/admin/index.html', '_blank')">
+                            🏠 管理后台
+                        </button>
+                        <button class="btn btn-secondary" onclick="window.open('https://supabase.com/dashboard/project/twfihaxptmhvdnapfovc', '_blank')">
+                            🌐 Supabase 控制台
+                        </button>
+                        <button class="btn btn-secondary" onclick="window.open('https://my-project-18w.pages.dev', '_blank')">
+                            🚀 主网站
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+    <script>
+        // 配置
+        const supabaseUrl = 'https://twfihaxptmhvdnapfovc.supabase.co';
+        const supabaseAnonKey = 'sb_publishable_IFWl0r0vz0m5Vr4_Gk5w-A_xG9lGTYj';
+        
+        // 全局变量
+        let supabase = null;
+        let logs = [];
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', async () => {
+            log('系统', '调试工具初始化中...', 'info');
+            
+            // 初始化 Supabase
+            try {
+                const { createClient } = window.supabase;
+                supabase = createClient(supabaseUrl, supabaseAnonKey, {
+                    auth: {
+                        persistSession: true,
+                        autoRefreshToken: true,
+                        detectSessionInUrl: true,
+                        storage: window.localStorage,
+                        storageKey: 'supabase.auth.token',
+                        flowType: 'pkce'
+                    }
+                });
+                log('Supabase', '客户端初始化成功', 'success');
+            } catch (error) {
+                log('Supabase', `客户端初始化失败: ${error.message}`, 'error');
+            }
+            
+            // 更新状态
+            await updateStatus();
+            
+            // 监听认证状态变化
+            if (supabase) {
+                supabase.auth.onAuthStateChange((event, session) => {
+                    log('认证状态', `${event} - ${session ? '有会话' : '无会话'}`, 'info');
+                    updateStatus();
+                });
+            }
+        });
+        
+        // 日志函数
+        function log(source, message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] [${source}] ${message}`;
+            logs.push({ source, message, type, timestamp });
+            
+            const logOutput = document.getElementById('logOutput');
+            const logElement = document.createElement('div');
+            logElement.className = `log-entry ${type}`;
+            logElement.textContent = logEntry;
+            logOutput.appendChild(logElement);
+            logOutput.scrollTop = logOutput.scrollHeight;
+            
+            console.log(`[${type.toUpperCase()}] ${source}: ${message}`);
+        }
+        
+        // 更新状态
+        async function updateStatus() {
+            // 会话状态
+            const sessionStatus = document.getElementById('sessionStatus');
+            const supabaseStatus = document.getElementById('supabaseStatus');
+            const currentUser = document.getElementById('currentUser');
+            const sessionExpiry = document.getElementById('sessionExpiry');
+            const storageStatus = document.getElementById('storageStatus');
+            
+            // 配置信息
+            const supabaseUrlEl = document.getElementById('supabaseUrl');
+            const currentDomainEl = document.getElementById('currentDomain');
+            const pagePathEl = document.getElementById('pagePath');
+            const browserInfoEl = document.getElementById('browserInfo');
+            
+            // 检查 Supabase 状态
+            if (!supabase) {
+                supabaseStatus.textContent = '未初始化';
+                supabaseStatus.className = 'info-value error';
+                sessionStatus.innerHTML = '<span class="status-dot status-inactive"></span><span>未初始化</span>';
+                return;
+            }
+            
+            supabaseStatus.textContent = '已初始化';
+            supabaseStatus.className = 'info-value success';
+            
+            // 检查会话
+            try {
+                const { data, error } = await supabase.auth.getSession();
+                
+                if (error) {
+                    log('会话检查', `错误: ${error.message}`, 'error');
+                    sessionStatus.innerHTML = '<span class="status-dot status-error"></span><span>错误</span>';
+                    currentUser.textContent = '获取失败';
+                    currentUser.className = 'info-value error';
+                    sessionExpiry.textContent = '未知';
+                } else if (data.session) {
+                    const user = data.session.user;
+                    const expiresAt = new Date(data.session.expires_at * 1000);
+                    const now = new Date();
+                    const timeLeft = Math.max(0, Math.floor((expiresAt - now) / 1000 / 60)); // 分钟
+                    
+                    currentUser.textContent = `${user.email} (${user.id.substring(0, 8)}...)`;
+                    currentUser.className = 'info-value success';
+                    
+                    if (timeLeft > 0) {
+                        sessionExpiry.textContent = `${timeLeft} 分钟后过期`;
+                        sessionExpiry.className = timeLeft > 5 ? 'info-value success' : 'info-value warning';
+                        sessionStatus.innerHTML = '<span class="status-dot status-active"></span><span>已登录</span>';
+                    } else {
+                        sessionExpiry.textContent = '已过期';
+                        sessionExpiry.className = 'info-value error';
+                        sessionStatus.innerHTML = '<span class="status-dot status-warning"></span><span>会话过期</span>';
+                    }
+                } else {
+                    currentUser.textContent = '未登录';
+                    currentUser.className = 'info-value';
+                    sessionExpiry.textContent = '无会话';
+                    sessionStatus.innerHTML = '<span class="status-dot status-inactive"></span><span>未登录</span>';
+                }
+            } catch (error) {
+                log('状态更新', `异常: ${error.message}`, 'error');
+                sessionStatus.innerHTML = '<span class="status-dot status-error"></span><span>异常</span>';
+            }
+            
+            // 检查存储状态
+            const hasToken = !!localStorage.getItem('supabase.auth.token');
+            storageStatus.textContent = hasToken ? '有令牌' : '无令牌';
+            storageStatus.className = hasToken ? 'info-value success' : 'info-value';
+            
+            // 配置信息
+            supabaseUrlEl.textContent = supabaseUrl;
+            currentDomainEl.textContent = window.location.hostname;
+            pagePathEl.textContent = window.location.pathname;
+            browserInfoEl.textContent = `${navigator.userAgent.substring(0, 50)}...`;
+        }
+        
+        // 测试登录
+        async function testLogin() {
+            log('测试登录', '开始测试登录...', 'info');
+            
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: 'admin@creatorhub.com',
+                    password: 'TempPassword123!'
+                });
+                
+                if (error) {
+                    log('测试登录', `失败: ${error.message}`, 'error');
+                    alert(`登录失败: ${error.message}`);
+                } else {
+                    log('测试登录', `成功: ${data.user.email}`, 'success');
+                    alert(`登录成功: ${data.user.email}`);
+                    await updateStatus();
+                }
+            } catch (error) {
+                log('测试登录', `异常: ${error.message}`, 'error');
+                alert(`登录异常: ${error.message}`);
+            }
+        }
+        
+        // 清除存储
+        function clearStorage() {
+            if (confirm('确定要清除所有本地存储数据吗？这会导致登出。')) {
+                localStorage.clear();
+                sessionStorage.clear();
+                log('存储', '已清除所有本地存储数据', 'warning');
+                alert('本地存储已清除');
+                updateStatus();
+            }
+        }
+        
+        // 强制登出
+        async function forceLogout() {
+            if (confirm('确定要强制登出吗？')) {
+                try {
+                    // 清除本地存储
+                    localStorage.removeItem('supabase.auth.token');
+                    sessionStorage.clear();
+                    
+                    // 尝试调用登出API
+                    if (supabase) {
+                        await supabase.auth.signOut();
+                    }
+                    
+                    log('强制登出', '已执行强制登出', 'success');
+                    alert('强制登出完成');
+                    await updateStatus();
+                } catch (error) {
+                    log('强制登出', `错误: ${error.message}`, 'error');
+                    alert(`强制登出错误: ${error.message}`);
+                }
+            }
+        }
+        
+        // 刷新会话
+        async function refreshSession() {
+            log('刷新会话', '正在刷新会话...', 'info');
+            
+            try {
+                const { data, error } = await supabase.auth.refreshSession();
+                
+                if (error) {
+                    log('刷新会话', `失败: ${error.message}`, 'error');
+                    alert(`刷新失败: ${error.message}`);
+                } else if (data.session) {
+                    log('刷新会话', '会话已刷新', 'success');
+                    alert('会话刷新成功');
+                    await updateStatus();
+                } else {
+                    log('刷新会话', '无会话可刷新', 'warning');
+                    alert('当前没有活动会话');
+                }
+            } catch (error) {
+                log('刷新会话', `异常: ${error.message}`, 'error');
+                alert(`刷新异常: ${error.message}`);
+            }
+        }
+        
+        // 检查 Supabase 配置
+        async function checkSupabaseConfig() {
+            log('配置检查', '正在检查 Supabase 配置...', 'info');
+            
+            try {
+                // 测试 API 连接
+                const response = await fetch(`${supabaseUrl}/rest/v1/`, {
+                    headers: {
+                        'apikey': supabaseAnonKey,
+                        'Authorization': `Bearer ${supabaseAnonKey}`
+                    }
+                });
+                
+                if (response.ok) {
+                    log('配置检查', 'Supabase API 连接正常', 'success');
+                } else {
+                    log('配置检查', `API 连接失败: ${response.status}`, 'error');
+                }
+                
+                // 检查认证端点
+                const authResponse = await fetch(`${supabaseUrl}/auth/v1/health`, {
+                    headers: {
+                        'apikey': supabaseAnonKey
+                    }
+                });
+                
+                if (authResponse.ok) {
+                    log('配置检查', '认证服务健康检查通过', 'success');
+                } else {
+                    log('配置检查', `认证服务异常: ${authResponse.status}`, 'error');
+                }
+                
+                alert('配置检查完成，请查看日志');
+            } catch (error) {
+                log('配置检查', `异常: ${error.message}`, 'error');
+                alert(`配置检查异常: ${error.message}`);
+            }
+        }
+        
+        // 复制配置
+        function copyConfig() {
+            const config = {
+                supabaseUrl,
+                supabaseAnonKey: supabaseAnonKey.substring(0, 20) + '...',
+                currentDomain: window.location.hostname,
+                pagePath: window.location.pathname,
+                userAgent: navigator.userAgent
+            };
+            
+            navigator.clipboard.writeText(JSON.stringify(config, null, 2))
+                .then(() => {
+                    log('复制', '配置已复制到剪贴板', 'success');
+                    alert('配置已复制');
+                })
+                .catch(err => {
+                    log('复制', `失败: ${err.message}`, 'error');
+                });
+        }
+        
+        // 复制日志
+        function copyLogs() {
+            const logText = logs.map(log => 
+                `[${log.timestamp}] [${log.source}] ${log.message}`
+            ).join('\n');
+            
+            navigator.clipboard.writeText(logText)
+                .then(() => {
+                    log('复制', '日志已复制到剪贴板', 'success');
+                    alert('日志已复制');
+                })
+                .catch(err => {
+                    log('复制', `失败: ${err.message}`, 'error');
+                });
+        }
+        
+        // 定期更新状态
+        setInterval(updateStatus, 5000);
+    </script>
+</body>
+</html>

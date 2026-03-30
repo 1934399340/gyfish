@@ -1,0 +1,16 @@
+{
+  "hosting": {
+    "public": "./",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "cloudbaserc.json",
+      "package-tencent.json",
+      "deploy*.bat",
+      "*.md",
+      "cloudbase-framework/",
+      "logs/"
+    ]
+  }
+}

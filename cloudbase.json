@@ -1,0 +1,12 @@
+{
+  "envId": "gyfish-4gbxsy3dc619f1e8",
+  "version": "2.0",
+  "framework": "static",
+  "outputDir": "./",
+  "region": "ap-guangzhou",
+  "trigger": {
+    "name": "cloudbase-trigger",
+    "type": "timer",
+    "config": "0 0 2 * * *"
+  }
+}

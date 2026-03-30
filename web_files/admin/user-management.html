@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户账户管理 - CreatorHub</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .header h1 {
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+        .header p {
+            color: #64748b;
+        }
+        .setup-section {
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .setup-section h2 {
+            color: #1e293b;
+            margin-top: 0;
+            margin-bottom: 16px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: #4f46e5;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #4338ca;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+        .message {
+            padding: 16px;
+            border-radius: 8px;
+            margin: 16px 0;
+            display: none;
+        }
+        .message.show {
+            display: block;
+        }
+        .message.success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+        .message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        .message.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+        .login-info {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+        .login-info h3 {
+            color: #92400e;
+            margin-top: 0;
+        }
+        .login-info ul {
+            color: #92400e;
+            padding-left: 20px;
+        }
+        .current-users {
+            margin-top: 24px;
+        }
+        .user-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        .user-email {
+            font-weight: 500;
+            color: #1e293b;
+        }
+        .user-status {
+            font-size: 14px;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👤 用户账户管理</h1>
+            <p>设置和管理 CreatorHub 管理后台的登录账户</p>
+        </div>
+        
+        <div class="setup-section">
+            <h2>🔧 创建管理员账户</h2>
+            <p>首次使用需要创建管理员账户才能登录后台</p>
+            
+            <div class="message info show">
+                <strong>💡 提示：</strong>创建账户后可以使用邮箱登录管理后台
+            </div>
+            
+            <form id="createUserForm">
+                <div class="form-group">
+                    <label for="adminEmail">管理员邮箱</label>
+                    <input type="email" id="adminEmail" class="form-control" placeholder="请输入邮箱地址" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="adminPassword">设置密码</label>
+                    <input type="password" id="adminPassword" class="form-control" placeholder="请输入密码（至少6位）" minlength="6" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword">确认密码</label>
+                    <input type="password" id="confirmPassword" class="form-control" placeholder="请再次输入密码" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <span>➕</span>
+                    <span>创建管理员账户</span>
+                </button>
+            </form>
+            
+            <div class="message" id="createMessage"></div>
+        </div>
+        
+        <div class="setup-section">
+            <h2>🔑 登录方式说明</h2>
+            
+            <div class="login-info">
+                <h3>可用的登录方式</h3>
+                <ul>
+                    <li><strong>邮箱登录</strong>：使用管理员邮箱和密码登录</li>
+                    <li><strong>GitHub登录</strong>：需要先配置GitHub OAuth应用</li>
+                </ul>
+            </div>
+            
+            <h3>GitHub OAuth 配置步骤</h3>
+            <ol>
+                <li>在 GitHub Developer Settings 中创建 OAuth App</li>
+                <li>设置回调URL：https://gyfish-4gbxsy3dc619f1e8.service.tcloudbase.com/auth/callback</li>
+                <li>在 CloudBase 控制台配置 GitHub 登录</li>
+                <li>获取 Client ID 和 Client Secret</li>
+            </ol>
+        </div>
+        
+        <div class="setup-section">
+            <h2>👥 当前用户列表</h2>
+            <div id="usersList">
+                <div class="message info show">
+                    <span>🔄 正在加载用户信息...</span>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 32px;">
+            <a href="./unified-login.html" class="btn btn-secondary">
+                <span>🔙</span>
+                <span>返回登录页面</span>
+            </a>
+        </div>
+    </div>
+
+    <script src="https://img.jsdelivr.net/npm/@cloudbase/js-sdk@2.4.1/dist/cloudbase.full.js"></script>
+    <script>
+        // 初始化 CloudBase
+        const app = cloudbase.init({
+            env: 'gyfish-4gbxsy3dc619f1e8',
+            region: 'ap-guangzhou'
+        });
+        const auth = app.auth();
+
+        // DOM 元素
+        const createUserForm = document.getElementById('createUserForm');
+        const createMessage = document.getElementById('createMessage');
+        const usersList = document.getElementById('usersList');
+
+        // 创建管理员账户
+        createUserForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('adminEmail').value.trim();
+            const password = document.getElementById('adminPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // 验证输入
+            if (password !== confirmPassword) {
+                showMessage('createMessage', 'error', '两次输入的密码不一致');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('createMessage', 'error', '密码长度至少6位');
+                return;
+            }
+            
+            try {
+                showMessage('createMessage', 'info', '正在创建账户...');
+                
+                // 创建用户
+                const result = await auth.signUpWithEmailAndPassword(email, password);
+                
+                if (result.code) {
+                    throw new Error(result.message);
+                }
+                
+                showMessage('createMessage', 'success', `✅ 管理员账户创建成功！邮箱：${email}`);
+                
+                // 清空表单
+                createUserForm.reset();
+                
+                // 刷新用户列表
+                loadUsers();
+                
+            } catch (error) {
+                console.error('创建账户失败:', error);
+                showMessage('createMessage', 'error', `❌ 创建失败：${error.message}`);
+            }
+        });
+
+        // 加载用户列表
+        async function loadUsers() {
+            try {
+                // 获取当前用户
+                const currentUser = await auth.getAuthState();
+                
+                let usersHTML = '';
+                
+                if (currentUser && currentUser.user) {
+                    usersHTML = `
+                        <div class="user-card">
+                            <div class="user-email">${currentUser.user.email}</div>
+                            <div class="user-status">🟢 当前登录用户</div>
+                        </div>
+                    `;
+                } else {
+                    usersHTML = `
+                        <div class="message info show">
+                            <span>📭 暂无用户账户，请先创建管理员账户</span>
+                        </div>
+                    `;
+                }
+                
+                usersList.innerHTML = usersHTML;
+                
+            } catch (error) {
+                console.error('加载用户列表失败:', error);
+                usersList.innerHTML = `
+                    <div class="message error show">
+                        <span>❌ 加载用户信息失败：${error.message}</span>
+                    </div>
+                `;
+            }
+        }
+
+        // 显示消息
+        function showMessage(elementId, type, message) {
+            const element = document.getElementById(elementId);
+            element.className = `message ${type} show`;
+            element.innerHTML = message;
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // 检查是否已登录
+                const authState = await auth.getAuthState();
+                
+                if (authState && authState.user) {
+                    showMessage('createMessage', 'success', `ℹ️ 检测到已登录用户：${authState.user.email}`);
+                }
+                
+                // 加载用户列表
+                loadUsers();
+                
+            } catch (error) {
+                console.error('初始化失败:', error);
+                showMessage('createMessage', 'error', `初始化失败：${error.message}`);
+            }
+        });
+    </script>
+</body>
+</html>
