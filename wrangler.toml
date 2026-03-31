@@ -1,0 +1,5 @@
+name = "gyfish-site"
+compatibility_date = "2024-01-01"
+
+# 静态站点配置
+pages_build_output_dir = "./web_files"
