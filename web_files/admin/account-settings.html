@@ -405,16 +405,24 @@
     </div>
 
     <script>
+        // API配置
+        const API_BASE = '';
+
         // 获取账户信息
-        function getAccount() {
-            const account = localStorage.getItem('admin_account');
-            return account ? JSON.parse(account) : { username: 'admin', password: 'admin', created: Date.now() };
+        async function getAccountInfo() {
+            try {
+                const response = await fetch(`${API_BASE}/api/account?action=info`);
+                const result = await response.json();
+                if (result.success) {
+                    return result.account;
+                }
+                throw new Error(result.error || '获取账户信息失败');
+            } catch (error) {
+                console.error('获取账户信息失败:', error);
+                throw error;
+            }
         }
-        
-        function saveAccount(account) {
-            localStorage.setItem('admin_account', JSON.stringify(account));
-        }
-        
+
         // 显示消息
         function showMessage(type, text) {
             const msg = document.getElementById('message');
@@ -422,135 +430,203 @@
             msg.textContent = text;
             setTimeout(() => { msg.className = 'message'; }, 4000);
         }
-        
-        // 加载账户信息
-        function loadAccountInfo() {
-            const account = getAccount();
-            const session = JSON.parse(localStorage.getItem('admin_session') || '{}');
-            
-            document.getElementById('currentUsername').textContent = account.username;
-            document.getElementById('accountCreated').textContent = new Date(account.created).toLocaleString('zh-CN');
-            document.getElementById('lastLogin').textContent = session.loginTime ? new Date(session.loginTime).toLocaleString('zh-CN') : '首次登录';
+
+        // 设置按钮加载状态
+        function setButtonLoading(button, loading, originalText) {
+            if (loading) {
+                button.disabled = true;
+                button.innerHTML = '处理中...';
+            } else {
+                button.disabled = false;
+                button.textContent = originalText;
+            }
         }
-        
+
+        // 加载账户信息
+        async function loadAccountInfo() {
+            try {
+                const account = await getAccountInfo();
+                const session = JSON.parse(localStorage.getItem('admin_session') || '{}');
+
+                document.getElementById('currentUsername').textContent = account.username;
+                document.getElementById('accountCreated').textContent = new Date(account.createdAt).toLocaleString('zh-CN');
+                document.getElementById('lastLogin').textContent = session.loginTime ? new Date(session.loginTime).toLocaleString('zh-CN') : '首次登录';
+            } catch (error) {
+                showMessage('error', '加载账户信息失败: ' + error.message);
+            }
+        }
+
         // 修改用户名
-        document.getElementById('usernameForm').addEventListener('submit', (e) => {
+        document.getElementById('usernameForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const currentPassword = document.getElementById('currentPasswordForUsername').value;
             const newUsername = document.getElementById('newUsername').value.trim();
-            const account = getAccount();
-            
-            // 验证当前密码
-            if (currentPassword !== account.password) {
-                showMessage('error', '当前密码错误');
-                return;
-            }
-            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+
             // 验证新用户名
             if (newUsername.length < 3) {
                 showMessage('error', '用户名至少需要3个字符');
                 return;
             }
-            
-            // 更新账户
-            account.username = newUsername;
-            saveAccount(account);
-            
-            // 更新会话
-            const session = JSON.parse(localStorage.getItem('admin_session') || '{}');
-            session.user = { username: newUsername, name: newUsername };
-            localStorage.setItem('admin_session', JSON.stringify(session));
-            
-            showMessage('success', '用户名已更新为：' + newUsername);
-            loadAccountInfo();
-            
-            // 清空表单
-            document.getElementById('currentPasswordForUsername').value = '';
-            document.getElementById('newUsername').value = '';
+
+            setButtonLoading(submitBtn, true, '保存用户名');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/account?action=username`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ currentPassword, newUsername })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // 更新会话
+                    const session = JSON.parse(localStorage.getItem('admin_session') || '{}');
+                    session.user = { username: newUsername };
+                    localStorage.setItem('admin_session', JSON.stringify(session));
+
+                    showMessage('success', '用户名已更新为：' + newUsername);
+                    loadAccountInfo();
+
+                    // 清空表单
+                    document.getElementById('currentPasswordForUsername').value = '';
+                    document.getElementById('newUsername').value = '';
+                } else {
+                    showMessage('error', result.error || '修改失败');
+                }
+            } catch (error) {
+                showMessage('error', '修改失败: ' + error.message);
+            } finally {
+                setButtonLoading(submitBtn, false, '保存用户名');
+            }
         });
-        
+
         // 修改密码
-        document.getElementById('passwordForm').addEventListener('submit', (e) => {
+        document.getElementById('passwordForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const currentPassword = document.getElementById('currentPassword').value;
             const newPassword = document.getElementById('newPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
-            const account = getAccount();
-            
-            // 验证当前密码
-            if (currentPassword !== account.password) {
-                showMessage('error', '当前密码错误');
-                return;
-            }
-            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+
             // 验证新密码
             if (newPassword.length < 4) {
                 showMessage('error', '新密码至少需要4个字符');
                 return;
             }
-            
+
             // 验证确认密码
             if (newPassword !== confirmPassword) {
                 showMessage('error', '两次输入的密码不一致');
                 return;
             }
-            
-            // 更新账户
-            account.password = newPassword;
-            saveAccount(account);
-            
-            showMessage('success', '密码修改成功！');
-            
-            // 清空表单
-            document.getElementById('currentPassword').value = '';
-            document.getElementById('newPassword').value = '';
-            document.getElementById('confirmPassword').value = '';
+
+            setButtonLoading(submitBtn, true, '保存密码');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/password`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ currentPassword, newPassword })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage('success', '密码修改成功！');
+
+                    // 清空表单
+                    document.getElementById('currentPassword').value = '';
+                    document.getElementById('newPassword').value = '';
+                    document.getElementById('confirmPassword').value = '';
+                } else {
+                    showMessage('error', result.error || '修改失败');
+                }
+            } catch (error) {
+                showMessage('error', '修改失败: ' + error.message);
+            } finally {
+                setButtonLoading(submitBtn, false, '保存密码');
+            }
         });
-        
-        // 重置账户
-        document.getElementById('resetAccountBtn').addEventListener('click', () => {
+
+        // 重置账户 - 这个功能需要管理员手动在D1数据库中操作
+        document.getElementById('resetAccountBtn').addEventListener('click', async () => {
             if (!confirm('确定要重置账户吗？这将恢复为默认账户 admin/admin，此操作不可撤销！')) {
                 return;
             }
-            
+
             if (!confirm('最后一次确认：账户将被重置为 admin/admin，继续吗？')) {
                 return;
             }
-            
-            // 重置为默认账户
-            const defaultAccount = {
-                username: 'admin',
-                password: 'admin',
-                created: Date.now()
-            };
-            saveAccount(defaultAccount);
-            
-            // 清除会话
-            localStorage.removeItem('admin_session');
-            
-            showMessage('success', '账户已重置，正在跳转到登录页...');
-            setTimeout(() => {
-                window.location.href = './login.html';
-            }, 1500);
+
+            const resetBtn = document.getElementById('resetAccountBtn');
+            setButtonLoading(resetBtn, true, '重置中...');
+
+            try {
+                // 调用重置API
+                const response = await fetch(`${API_BASE}/api/account?action=reset`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // 清除会话
+                    localStorage.removeItem('admin_session');
+
+                    showMessage('success', '账户已重置，正在跳转到登录页...');
+                    setTimeout(() => {
+                        window.location.href = './login.html';
+                    }, 1500);
+                } else {
+                    showMessage('error', result.error || '重置失败');
+                }
+            } catch (error) {
+                showMessage('error', '重置失败: ' + error.message);
+            } finally {
+                setButtonLoading(resetBtn, false, '重置账户');
+            }
         });
-        
+
         // 退出登录
         document.getElementById('logoutNav').addEventListener('click', () => {
             localStorage.removeItem('admin_session');
             window.location.href = './login.html';
         });
-        
+
         // 页面加载
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             const session = localStorage.getItem('admin_session');
             if (!session) {
                 window.location.href = './login.html';
                 return;
             }
-            
-            loadAccountInfo();
+
+            // 验证会话是否过期
+            try {
+                const sessionData = JSON.parse(session);
+                if (Date.now() > sessionData.expires) {
+                    localStorage.removeItem('admin_session');
+                    window.location.href = './login.html';
+                    return;
+                }
+            } catch (e) {
+                localStorage.removeItem('admin_session');
+                window.location.href = './login.html';
+                return;
+            }
+
+            await loadAccountInfo();
         });
     </script>
 </body>

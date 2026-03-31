@@ -25,25 +25,18 @@
             --radius: 12px;
             --transition: all 0.3s ease;
         }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg-light);
             color: var(--dark);
             min-height: 100vh;
         }
-        
-        .container {
-            display: flex;
-            min-height: 100vh;
-        }
-        
+
+        .container { display: flex; min-height: 100vh; }
+
         /* 侧边栏 */
         .sidebar {
             width: 260px;
@@ -51,12 +44,11 @@
             color: var(--white);
             padding: 24px 0;
             position: fixed;
-            top: 0;
-            left: 0;
+            top: 0; left: 0;
             height: 100vh;
             overflow-y: auto;
         }
-        
+
         .logo {
             display: flex;
             align-items: center;
@@ -64,10 +56,9 @@
             padding: 0 24px;
             margin-bottom: 32px;
         }
-        
+
         .logo-icon {
-            width: 40px;
-            height: 40px;
+            width: 40px; height: 40px;
             background: var(--primary);
             border-radius: 10px;
             display: flex;
@@ -75,16 +66,11 @@
             justify-content: center;
             font-size: 20px;
         }
-        
-        .logo-text {
-            font-size: 20px;
-            font-weight: 700;
-        }
-        
-        .nav-section {
-            margin-bottom: 24px;
-        }
-        
+
+        .logo-text { font-size: 20px; font-weight: 700; }
+
+        .nav-section { margin-bottom: 24px; }
+
         .nav-title {
             font-size: 11px;
             text-transform: uppercase;
@@ -93,7 +79,7 @@
             padding: 0 24px;
             margin-bottom: 8px;
         }
-        
+
         .nav-item {
             display: flex;
             align-items: center;
@@ -104,30 +90,25 @@
             transition: var(--transition);
             cursor: pointer;
         }
-        
+
         .nav-item:hover {
             background: rgba(255, 255, 255, 0.1);
             color: var(--white);
         }
-        
+
         .nav-item.active {
             background: rgba(99, 102, 241, 0.2);
             color: var(--primary-light);
             border-right: 3px solid var(--primary);
         }
-        
-        .nav-item i {
-            width: 20px;
-            text-align: center;
-        }
-        
+
         /* 主内容区 */
         .main-content {
             flex: 1;
             margin-left: 260px;
             padding: 24px;
         }
-        
+
         .header {
             display: flex;
             justify-content: space-between;
@@ -136,21 +117,17 @@
             padding-bottom: 24px;
             border-bottom: 1px solid var(--gray-lighter);
         }
-        
-        .header h1 {
-            font-size: 28px;
-            font-weight: 700;
-        }
-        
+
+        .header h1 { font-size: 28px; font-weight: 700; }
+
         .user-info {
             display: flex;
             align-items: center;
             gap: 16px;
         }
-        
+
         .user-avatar {
-            width: 40px;
-            height: 40px;
+            width: 40px; height: 40px;
             background: var(--primary);
             border-radius: 50%;
             display: flex;
@@ -159,7 +136,7 @@
             color: white;
             font-weight: 600;
         }
-        
+
         .logout-btn {
             padding: 8px 16px;
             background: transparent;
@@ -169,12 +146,12 @@
             cursor: pointer;
             transition: var(--transition);
         }
-        
+
         .logout-btn:hover {
             border-color: var(--secondary);
             color: var(--secondary);
         }
-        
+
         /* 状态卡片 */
         .stats-grid {
             display: grid;
@@ -182,108 +159,84 @@
             gap: 24px;
             margin-bottom: 32px;
         }
-        
+
         .stat-card {
             background: var(--white);
             border-radius: var(--radius);
             padding: 24px;
             box-shadow: var(--shadow);
         }
-        
+
         .stat-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 16px;
         }
-        
-        .stat-title {
-            font-size: 14px;
-            color: var(--gray);
-            margin-bottom: 4px;
-        }
-        
-        .stat-value {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--dark);
-        }
-        
+
+        .stat-title { font-size: 14px; color: var(--gray); margin-bottom: 4px; }
+
+        .stat-value { font-size: 32px; font-weight: 700; color: var(--dark); }
+
         .stat-icon {
-            width: 48px;
-            height: 48px;
+            width: 48px; height: 48px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
         }
-        
+
         .stat-icon.blue { background: #eff6ff; color: #2563eb; }
         .stat-icon.green { background: #f0fdf4; color: #16a34a; }
         .stat-icon.purple { background: #faf5ff; color: #9333ea; }
         .stat-icon.pink { background: #fdf2f8; color: #db2777; }
-        
-        .stat-change {
-            font-size: 13px;
-            margin-top: 8px;
-        }
-        
+
+        .stat-change { font-size: 13px; margin-top: 8px; }
         .stat-change.positive { color: #16a34a; }
         .stat-change.negative { color: #dc2626; }
-        
+
         /* 功能模块 */
-        .modules-section {
-            margin-bottom: 32px;
-        }
-        
-        .section-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-        
+        .modules-section { margin-bottom: 32px; }
+
+        .section-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; }
+
         .modules-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
         }
-        
+
         .module-card {
             background: var(--white);
             border-radius: var(--radius);
             padding: 24px;
             box-shadow: var(--shadow);
-            transition: var(--transition);
             cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
         }
-        
+
         .module-card:hover {
             transform: translateY(-4px);
             box-shadow: var(--shadow-lg);
+            border-color: var(--primary-light);
         }
-        
+
         .module-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 14px;
+            width: 56px; height: 56px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 28px;
             margin-bottom: 16px;
         }
-        
-        .module-card h3 {
-            font-size: 18px;
-            margin-bottom: 8px;
-        }
-        
-        .module-card p {
-            font-size: 14px;
-            color: var(--gray);
-        }
-        
+
+        .module-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+
+        .module-card p { font-size: 14px; color: var(--gray); }
+
         /* 系统状态 */
         .status-section {
             background: var(--white);
@@ -291,47 +244,38 @@
             padding: 24px;
             box-shadow: var(--shadow);
         }
-        
+
         .status-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 0;
+            padding: 12px 0;
             border-bottom: 1px solid var(--gray-lighter);
         }
-        
-        .status-item:last-child {
-            border-bottom: none;
-        }
-        
-        .status-label {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
+
+        .status-item:last-of-type { border-bottom: none; }
+
+        .status-label { display: flex; align-items: center; gap: 8px; }
+
         .status-dot {
-            width: 10px;
-            height: 10px;
+            width: 8px; height: 8px;
             border-radius: 50%;
+            background: var(--gray);
         }
-        
+
         .status-dot.online { background: #16a34a; }
-        .status-dot.offline { background: #dc2626; }
         .status-dot.pending { background: #f59e0b; }
-        
-        .status-value {
-            font-size: 14px;
-            color: var(--gray);
-        }
-        
-        /* 快速操作 */
+        .status-dot.error { background: #dc2626; }
+
+        .status-value { font-weight: 500; }
+
         .quick-actions {
             display: flex;
             gap: 12px;
-            margin-top: 16px;
+            margin-top: 20px;
+            flex-wrap: wrap;
         }
-        
+
         .action-btn {
             padding: 10px 20px;
             border-radius: var(--radius);
@@ -341,35 +285,11 @@
             cursor: pointer;
             transition: var(--transition);
         }
-        
-        .action-btn.primary {
-            background: var(--primary);
-            color: white;
-        }
-        
-        .action-btn.primary:hover {
-            background: var(--primary-dark);
-        }
-        
-        .action-btn.secondary {
-            background: var(--bg-light);
-            color: var(--dark);
-            border: 1px solid var(--gray-lighter);
-        }
-        
-        .action-btn.secondary:hover {
-            background: var(--gray-lighter);
-        }
-        
-        /* 响应式 */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            .main-content {
-                margin-left: 0;
-            }
-        }
+
+        .action-btn.primary { background: var(--primary); color: white; }
+        .action-btn.primary:hover { background: var(--primary-dark); }
+        .action-btn.secondary { background: var(--gray-lighter); color: var(--dark); }
+        .action-btn.secondary:hover { background: var(--gray-light); }
     </style>
 </head>
 <body>
@@ -380,48 +300,45 @@
                 <div class="logo-icon">✦</div>
                 <span class="logo-text">CreatorHub</span>
             </div>
-            
+
             <nav class="nav-section">
                 <div class="nav-title">概览</div>
-                <a class="nav-item active" data-page="dashboard">
-                    <i>📊</i>
-                    <span>仪表盘</span>
+                <a class="nav-item active" href="./index.html">
+                    <span>📊</span><span>仪表盘</span>
                 </a>
             </nav>
-            
+
             <nav class="nav-section">
                 <div class="nav-title">内容管理</div>
-                <a class="nav-item" href="../portfolio.html">
-                    <i>🎬</i>
-                    <span>作品集</span>
+                <a class="nav-item" href="./works-management.html">
+                    <span>🎬</span><span>作品管理</span>
                 </a>
-                <a class="nav-item" href="../copywriting.html">
-                    <i>✍️</i>
-                    <span>文案研究</span>
+                <a class="nav-item" href="./articles-management.html">
+                    <span>📝</span><span>文章管理</span>
                 </a>
-                <a class="nav-item" href="../editing.html">
-                    <i>✂️</i>
-                    <span>剪辑技巧</span>
-                </a>
-                <a class="nav-item" href="../photography.html">
-                    <i>📷</i>
-                    <span>摄影作品</span>
+                <a class="nav-item" href="./content-editor.html">
+                    <span>✏️</span><span>内容编辑</span>
                 </a>
             </nav>
-            
+
+            <nav class="nav-section">
+                <div class="nav-title">消息</div>
+                <a class="nav-item" href="./messages.html">
+                    <span>📧</span><span>联系消息</span>
+                </a>
+            </nav>
+
             <nav class="nav-section">
                 <div class="nav-title">系统</div>
-                <a class="nav-item" id="settingsNav">
-                    <i>⚙️</i>
-                    <span>账户设置</span>
+                <a class="nav-item" href="./account-settings.html">
+                    <span>⚙️</span><span>账户设置</span>
                 </a>
                 <a class="nav-item" id="logoutNav">
-                    <i>🚪</i>
-                    <span>退出登录</span>
+                    <span>🚪</span><span>退出登录</span>
                 </a>
             </nav>
         </aside>
-        
+
         <!-- 主内容 -->
         <main class="main-content">
             <header class="header">
@@ -431,227 +348,186 @@
                     <button class="logout-btn" id="logoutBtn">退出登录</button>
                 </div>
             </header>
-            
+
             <!-- 数据统计 -->
             <section class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-header">
                         <div>
-                            <div class="stat-title">总访问量</div>
-                            <div class="stat-value" id="totalViews">1,234</div>
-                        </div>
-                        <div class="stat-icon blue">👁️</div>
-                    </div>
-                    <div class="stat-change positive">↑ 12.5% 较上周</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div>
                             <div class="stat-title">作品数量</div>
-                            <div class="stat-value" id="totalWorks">24</div>
+                            <div class="stat-value" id="totalWorks">-</div>
                         </div>
-                        <div class="stat-icon green">🎬</div>
+                        <div class="stat-icon blue">🎬</div>
                     </div>
-                    <div class="stat-change positive">↑ 3 本月新增</div>
+                    <div class="stat-change positive" id="worksChange">加载中...</div>
                 </div>
-                
+
                 <div class="stat-card">
                     <div class="stat-header">
                         <div>
                             <div class="stat-title">文章数量</div>
-                            <div class="stat-value" id="totalArticles">18</div>
+                            <div class="stat-value" id="totalArticles">-</div>
                         </div>
-                        <div class="stat-icon purple">📝</div>
+                        <div class="stat-icon green">📝</div>
                     </div>
-                    <div class="stat-change positive">↑ 5 本月新增</div>
+                    <div class="stat-change positive" id="articlesChange">加载中...</div>
                 </div>
-                
+
                 <div class="stat-card">
                     <div class="stat-header">
                         <div>
                             <div class="stat-title">联系咨询</div>
-                            <div class="stat-value" id="totalContacts">8</div>
+                            <div class="stat-value" id="totalContacts">-</div>
                         </div>
                         <div class="stat-icon pink">💬</div>
                     </div>
-                    <div class="stat-change positive">↑ 2 待处理</div>
+                    <div class="stat-change" id="contactsChange">加载中...</div>
                 </div>
             </section>
-            
+
             <!-- 功能模块 -->
             <section class="modules-section">
-                <h2 class="section-title">功能模块</h2>
+                <h2 class="section-title">内容管理</h2>
                 <div class="modules-grid">
-                    <div class="module-card" onclick="window.location.href='./content-editor.html?page=portfolio'">
+                    <div class="module-card" onclick="location.href='./works-management.html'">
                         <div class="module-icon" style="background: #eff6ff; color: #2563eb;">🎬</div>
                         <h3>作品管理</h3>
                         <p>管理您的视频作品集，添加、编辑或删除作品</p>
                     </div>
-                    
-                    <div class="module-card" onclick="window.location.href='./content-editor.html?page=copywriting'">
+
+                    <div class="module-card" onclick="location.href='./articles-management.html'">
                         <div class="module-icon" style="background: #f0fdf4; color: #16a34a;">✍️</div>
                         <h3>文案研究</h3>
                         <p>发布和管理文案创作相关的文章内容</p>
                     </div>
-                    
-                    <div class="module-card" onclick="window.location.href='./content-editor.html?page=editing'">
+
+                    <div class="module-card" onclick="location.href='./articles-management.html?category=editing'">
                         <div class="module-icon" style="background: #faf5ff; color: #9333ea;">✂️</div>
                         <h3>剪辑技巧</h3>
                         <p>分享视频剪辑技巧和教程内容</p>
                     </div>
-                    
-                    <div class="module-card" onclick="window.location.href='./content-editor.html?page=photography'">
+
+                    <div class="module-card" onclick="location.href='./articles-management.html?category=photography'">
                         <div class="module-icon" style="background: #fdf2f8; color: #db2777;">📷</div>
                         <h3>摄影作品</h3>
                         <p>展示和管理摄影作品集</p>
                     </div>
-                    
-                    <div class="module-card" onclick="window.location.href='./content-editor.html?page=about'">
+
+                    <div class="module-card" onclick="location.href='./content-editor.html?page=about'">
                         <div class="module-icon" style="background: #fef3c7; color: #d97706;">👤</div>
                         <h3>个人简介</h3>
                         <p>编辑个人信息和简介内容</p>
                     </div>
-                    
-                    <div class="module-card" onclick="window.location.href='./content-editor.html?page=contact'">
-                        <div class="module-icon" style="background: #e0e7ff; color: #4f46e5;">📧</div>
-                        <h3>联系方式</h3>
-                        <p>管理联系信息和社交媒体链接</p>
+
+                    <div class="module-card" onclick="location.href='./content-editor.html?page=home'">
+                        <div class="module-icon" style="background: #e0e7ff; color: #4f46e5;">🏠</div>
+                        <h3>首页内容</h3>
+                        <p>编辑首页英雄区域和统计数据</p>
                     </div>
-                    
-                    <div class="module-card" onclick="window.open('../portfolio.html', '_blank')">
-                        <div class="module-icon" style="background: #fef9c3; color: #ca8a04;">👁️</div>
-                        <h3>预览网站</h3>
-                        <p>在新窗口中预览前端网站效果</p>
+
+                    <div class="module-card" onclick="location.href='./messages.html'">
+                        <div class="module-icon" style="background: #fce7f3; color: #be185d;">📧</div>
+                        <h3>联系消息</h3>
+                        <p>查看和管理用户提交的咨询消息</p>
                     </div>
-                    
-                    <div class="module-card" onclick="window.open('https://console.cloud.tencent.com/tcb', '_blank')">
-                        <div class="module-icon" style="background: #e0f2fe; color: #0284c7;">☁️</div>
-                        <h3>云控制台</h3>
-                        <p>打开腾讯云CloudBase控制台</p>
+
+                    <div class="module-card" onclick="location.href='./account-settings.html'">
+                        <div class="module-icon" style="background: #f1f5f9; color: #475569;">⚙️</div>
+                        <h3>账户设置</h3>
+                        <p>修改用户名、密码等账户信息</p>
                     </div>
                 </div>
             </section>
-            
-            <!-- 系统状态 -->
+
+            <!-- 快捷操作 -->
             <section class="status-section">
-                <h2 class="section-title">系统状态</h2>
-                
-                <div class="status-item">
-                    <div class="status-label">
-                        <span class="status-dot online"></span>
-                        <span>网站状态</span>
-                    </div>
-                    <span class="status-value">正常运行</span>
-                </div>
-                
-                <div class="status-item">
-                    <div class="status-label">
-                        <span class="status-dot online"></span>
-                        <span>数据库</span>
-                    </div>
-                    <span class="status-value">本地存储模式</span>
-                </div>
-                
-                <div class="status-item">
-                    <div class="status-label">
-                        <span class="status-dot online"></span>
-                        <span>云存储</span>
-                    </div>
-                    <span class="status-value">CloudBase 已连接</span>
-                </div>
-                
-                <div class="status-item">
-                    <div class="status-label">
-                        <span class="status-dot online" id="githubStatus"></span>
-                        <span>GitHub 同步</span>
-                    </div>
-                    <span class="status-value" id="githubStatusText">已连接</span>
-                </div>
-                
-                <div class="status-item">
-                    <div class="status-label">
-                        <span class="status-dot" id="messageDot"></span>
-                        <span>站内消息</span>
-                    </div>
-                    <span class="status-value" id="messageCount">检查中...</span>
-                </div>
-                
+                <h2 class="section-title">快捷操作</h2>
                 <div class="quick-actions">
-                    <button class="action-btn primary" onclick="window.location.href='./messages.html'">查看消息</button>
-                    <button class="action-btn secondary" onclick="window.location.href='./account-settings.html'">账户设置</button>
-                    <button class="action-btn secondary" onclick="window.open('https://github.com/1934399340/my-project', '_blank')">GitHub仓库</button>
-                    <button class="action-btn secondary" onclick="window.open('https://console.cloud.tencent.com/tcb', '_blank')">云控制台</button>
+                    <button class="action-btn primary" onclick="location.href='./works-management.html'">管理作品</button>
+                    <button class="action-btn secondary" onclick="location.href='./articles-management.html'">管理文章</button>
+                    <button class="action-btn secondary" onclick="location.href='./messages.html'">查看消息</button>
+                    <button class="action-btn secondary" onclick="location.href='./account-settings.html'">账户设置</button>
+                    <button class="action-btn secondary" onclick="window.open('https://dash.cloudflare.com', '_blank')">Cloudflare</button>
+                    <button class="action-btn secondary" onclick="window.open('../index.html', '_blank')">预览网站</button>
                 </div>
             </section>
         </main>
     </div>
 
     <script>
+        const API_BASE = '';
+
         // 检查登录状态
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             const sessionStr = localStorage.getItem('admin_session');
             if (!sessionStr) {
-                window.location.href = './login.html';
+                location.href = './login.html';
                 return;
             }
-            
+
             try {
                 const session = JSON.parse(sessionStr);
                 if (Date.now() > session.expires) {
                     localStorage.removeItem('admin_session');
-                    window.location.href = './login.html';
+                    location.href = './login.html';
                     return;
                 }
-                
+
                 // 更新用户信息
-                document.getElementById('adminName').textContent = session.user.name || '管理员';
-                document.getElementById('userAvatar').textContent = (session.user.name || '管').charAt(0);
+                document.getElementById('adminName').textContent = session.user.username || '管理员';
+                document.getElementById('userAvatar').textContent = (session.user.username || '管').charAt(0).toUpperCase();
             } catch (e) {
-                window.location.href = './login.html';
+                location.href = './login.html';
             }
-            
-            // 检查消息状态
-            checkMessages();
-            
-            // GitHub状态显示为已连接
-            document.getElementById('githubStatus').className = 'status-dot online';
-            document.getElementById('githubStatusText').textContent = '已连接';
+
+            // 加载统计数据
+            await loadStats();
         });
-        
-        // 检查消息状态
-        function checkMessages() {
-            const messages = JSON.parse(localStorage.getItem('contact_messages') || '[]');
-            const unreadCount = messages.filter(m => !m.read).length;
-            const messageDot = document.getElementById('messageDot');
-            const messageCount = document.getElementById('messageCount');
-            
-            if (unreadCount > 0) {
-                messageDot.className = 'status-dot pending';
-                messageCount.textContent = `${unreadCount} 条未读`;
-            } else {
-                messageDot.className = 'status-dot online';
-                messageCount.textContent = messages.length > 0 ? `${messages.length} 条消息` : '暂无消息';
+
+        // 加载统计数据
+        async function loadStats() {
+            try {
+                // 获取作品数量
+                const worksRes = await fetch(`${API_BASE}/api/works`);
+                const worksData = await worksRes.json();
+                const worksCount = worksData.success ? worksData.works.length : 0;
+                document.getElementById('totalWorks').textContent = worksCount;
+                document.getElementById('worksChange').textContent = `共 ${worksCount} 个作品`;
+
+                // 获取文章数量
+                const articlesRes = await fetch(`${API_BASE}/api/articles`);
+                const articlesData = await articlesRes.json();
+                const articlesCount = articlesData.success ? articlesData.articles.length : 0;
+                document.getElementById('totalArticles').textContent = articlesCount;
+                document.getElementById('articlesChange').textContent = `共 ${articlesCount} 篇`;
+
+                // 获取消息数量
+                const messagesRes = await fetch(`${API_BASE}/api/messages`);
+                const messagesData = await messagesRes.json();
+                if (messagesData.success) {
+                    const messages = messagesData.messages || [];
+                    const unread = messages.filter(m => !m.read).length;
+                    document.getElementById('totalContacts').textContent = messages.length;
+                    document.getElementById('contactsChange').textContent = unread > 0 ? `${unread} 条未读` : '暂无未读';
+                    document.getElementById('contactsChange').className = unread > 0 ? 'stat-change negative' : 'stat-change positive';
+                }
+            } catch (error) {
+                console.error('加载统计数据失败:', error);
+                document.getElementById('totalWorks').textContent = '-';
+                document.getElementById('totalArticles').textContent = '-';
+                document.getElementById('totalContacts').textContent = '-';
             }
-            
-            // 更新联系咨询统计
-            document.getElementById('totalContacts').textContent = messages.length;
         }
-        
+
         // 退出登录
         document.getElementById('logoutBtn').addEventListener('click', () => {
             localStorage.removeItem('admin_session');
-            window.location.href = './login.html';
+            location.href = './login.html';
         });
-        
+
         document.getElementById('logoutNav').addEventListener('click', () => {
             localStorage.removeItem('admin_session');
-            window.location.href = './login.html';
-        });
-        
-        // 账户设置
-        document.getElementById('settingsNav').addEventListener('click', () => {
-            window.location.href = './account-settings.html';
+            location.href = './login.html';
         });
     </script>
 </body>

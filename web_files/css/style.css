@@ -187,16 +187,21 @@ img {
     background: rgba(255, 255, 255, 0.1);
 }
 
-/* 管理员入口链接 */
+/* 管理员入口链接 - 更醒目的样式 */
 .admin-link {
-    background: rgba(99, 102, 241, 0.2) !important;
-    border: 1px solid rgba(99, 102, 241, 0.4);
-    color: #a5b4fc !important;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(236, 72, 153, 0.3)) !important;
+    border: 1px solid rgba(99, 102, 241, 0.6) !important;
+    color: #e0e7ff !important;
+    font-weight: 600 !important;
+    margin-left: 16px !important;
+    padding: 8px 20px !important;
 }
 
 .admin-link:hover {
-    background: rgba(99, 102, 241, 0.4) !important;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.5), rgba(236, 72, 153, 0.5)) !important;
+    border-color: rgba(99, 102, 241, 0.8) !important;
     color: var(--white) !important;
+    transform: translateY(-1px);
 }
 
 .nav-toggle {
@@ -425,6 +430,37 @@ img {
 
 .work-link:hover {
     color: var(--white);
+}
+
+/* 首页作品卡片内联详情 */
+.work-details-inline {
+    padding: 16px;
+    border-top: 1px solid var(--gray-lighter);
+}
+
+.work-content-preview {
+    font-size: 0.875rem;
+    color: var(--gray);
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+
+.work-tools {
+    display: flex;
+    gap: 8px;
+}
+
+.work-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 4px 10px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 50px;
+    z-index: 5;
 }
 
 .services {

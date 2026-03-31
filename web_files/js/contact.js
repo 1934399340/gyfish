@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const contactForm = document.getElementById('contactForm');
     const RATE_LIMIT_KEY = 'contact_form_last_submit';
     const RATE_LIMIT_SECONDS = 60;
-    const MESSAGES_KEY = 'contact_messages';
+    const API_BASE = '';
 
     function getLastSubmitTime() {
         const lastTime = localStorage.getItem(RATE_LIMIT_KEY);
@@ -90,33 +90,61 @@ document.addEventListener('DOMContentLoaded', function() {
             submitBtn.classList.add('btn-disabled');
 
             try {
-                // 保存消息到本地存储（管理后台可查看）
-                const messages = JSON.parse(localStorage.getItem(MESSAGES_KEY) || '[]');
-                const newMessage = {
-                    id: Date.now(),
-                    name: name,
-                    email: email,
-                    subject: subject,
-                    message: message,
-                    time: new Date().toLocaleString('zh-CN'),
-                    read: false
-                };
-                messages.unshift(newMessage);
-                
-                // 只保留最近100条消息
-                if (messages.length > 100) {
-                    messages.splice(100);
+                // 1. 保存消息到数据库
+                const response = await fetch(`${API_BASE}/api/messages`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        email: email,
+                        subject: subject,
+                        message: message
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    setLastSubmitTime(Math.floor(Date.now() / 1000));
+
+                    // 2. 打开邮件客户端发送邮件（确保邮件能收到）
+                    const subjectMap = {
+                        'video': '视频创作合作',
+                        'photo': '摄影服务',
+                        'copy': '文案策划',
+                        'other': '其他咨询'
+                    };
+                    const subjectText = subjectMap[subject] || subject;
+
+                    const mailtoLink = `mailto:1934399340@qq.com?subject=${encodeURIComponent('[' + subjectText + ' - CreatorHub] 来自 ' + name)}&body=${encodeURIComponent('姓名: ' + name + '\n邮箱: ' + email + '\n主题: ' + subjectText + '\n\n' + message)}`;
+
+                    // 打开邮件客户端
+                    window.location.href = mailtoLink;
+
+                    alert('✅ 消息已保存！如果邮件客户端没有打开，请手动发送邮件到 1934399340@qq.com');
+                    contactForm.reset();
+                } else {
+                    throw new Error(result.error || '发送失败');
                 }
-                
-                localStorage.setItem(MESSAGES_KEY, JSON.stringify(messages));
-                setLastSubmitTime(Math.floor(Date.now() / 1000));
-                
-                alert('✅ 消息发送成功！我们会尽快回复您。');
-                contactForm.reset();
-                
+
             } catch (error) {
                 console.error('发送失败:', error);
-                alert('❌ 发送失败，请稍后重试！');
+
+                // 如果API失败，使用邮件作为备用
+                const subjectMap = {
+                    'video': '视频创作合作',
+                    'photo': '摄影服务',
+                    'copy': '文案策划',
+                    'other': '其他咨询'
+                };
+                const subjectText = subjectMap[subject] || subject;
+
+                const mailtoLink = `mailto:1934399340@qq.com?subject=${encodeURIComponent('[' + subjectText + ' - CreatorHub] 来自 ' + name)}&body=${encodeURIComponent('姓名: ' + name + '\n邮箱: ' + email + '\n主题: ' + subjectText + '\n\n' + message)}`;
+                window.location.href = mailtoLink;
+
+                alert('⚠️ 正在打开邮件客户端，请完成发送邮件到 1934399340@qq.com');
             } finally {
                 submitBtn.textContent = originalText;
                 updateButtonState(submitBtn, RATE_LIMIT_SECONDS);
@@ -129,16 +157,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }, 1000);
             }
-        });
-
-        const inputs = contactForm.querySelectorAll('input, select, textarea');
-        inputs.forEach(input => {
-            input.addEventListener('focus', function() {
-                this.parentElement.classList.add('focused');
-            });
-            input.addEventListener('blur', function() {
-                this.parentElement.classList.remove('focused');
-            });
         });
     }
 
