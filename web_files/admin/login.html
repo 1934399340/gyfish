@@ -12,7 +12,6 @@
             --primary: #6366f1;
             --primary-dark: #4f46e5;
             --primary-light: #818cf8;
-            --secondary: #ec4899;
             --dark: #0f172a;
             --dark-light: #1e293b;
             --gray: #64748b;
@@ -20,8 +19,7 @@
             --gray-lighter: #cbd5e1;
             --white: #ffffff;
             --bg-light: #f8fafc;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             --radius: 12px;
             --transition: all 0.3s ease;
         }
@@ -47,7 +45,7 @@
             border-radius: 24px;
             padding: 48px;
             width: 100%;
-            max-width: 440px;
+            max-width: 420px;
             box-shadow: var(--shadow-lg);
         }
         
@@ -166,64 +164,6 @@
             border: 1px solid #bbf7d0;
         }
         
-        .message.info {
-            background: #eff6ff;
-            color: #2563eb;
-            border: 1px solid #bfdbfe;
-        }
-        
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 24px 0;
-            color: var(--gray);
-            font-size: 14px;
-        }
-        
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--gray-lighter);
-        }
-        
-        .divider::before {
-            margin-right: 16px;
-        }
-        
-        .divider::after {
-            margin-left: 16px;
-        }
-        
-        .github-btn {
-            width: 100%;
-            padding: 14px;
-            background: var(--dark);
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            font-size: 15px;
-            font-weight: 500;
-            font-family: inherit;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .github-btn:hover {
-            background: var(--dark-light);
-            transform: translateY(-2px);
-        }
-        
-        .github-btn svg {
-            width: 20px;
-            height: 20px;
-        }
-        
         .footer {
             margin-top: 24px;
             text-align: center;
@@ -262,7 +202,7 @@
         <div class="logo">
             <div class="logo-icon">✦</div>
             <h1>CreatorHub</h1>
-            <p>管理后台登录</p>
+            <p>管理员登录</p>
         </div>
         
         <div id="message" class="message"></div>
@@ -281,33 +221,16 @@
             <button type="submit" class="btn" id="loginBtn">登 录</button>
         </form>
         
-        <div class="divider">或</div>
-        
-        <button class="github-btn" id="githubBtn">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-            </svg>
-            使用 GitHub 登录
-        </button>
-        
         <div class="footer">
-            <p>默认账号: admin / admin</p>
-            <p style="margin-top: 8px;"><a href="../index.html">← 返回首页</a></p>
+            <p><a href="../index.html">← 返回首页</a></p>
         </div>
     </div>
 
     <script>
-        // 默认管理员账户
-        const DEFAULT_ADMIN = {
-            username: 'admin',
-            password: 'admin'
-        };
-        
         // DOM元素
         const loginForm = document.getElementById('loginForm');
         const loginBtn = document.getElementById('loginBtn');
         const message = document.getElementById('message');
-        const githubBtn = document.getElementById('githubBtn');
         
         // 显示消息
         function showMessage(type, text) {
@@ -340,18 +263,20 @@
             setLoading(true);
             
             // 模拟验证延迟
-            await new Promise(resolve => setTimeout(resolve, 800));
+            await new Promise(resolve => setTimeout(resolve, 500));
             
-            if (username === DEFAULT_ADMIN.username && password === DEFAULT_ADMIN.password) {
+            // 获取存储的账户信息
+            const storedAccount = JSON.parse(localStorage.getItem('admin_account') || '{"username":"admin","password":"admin"}');
+            
+            if (username === storedAccount.username && password === storedAccount.password) {
                 // 登录成功
                 const session = {
                     user: {
                         username: username,
-                        name: '管理员',
-                        role: 'admin'
+                        name: username
                     },
                     loginTime: Date.now(),
-                    expires: Date.now() + 24 * 60 * 60 * 1000 // 24小时
+                    expires: Date.now() + 24 * 60 * 60 * 1000 // 24小时过期
                 };
                 
                 localStorage.setItem('admin_session', JSON.stringify(session));
@@ -359,16 +284,11 @@
                 
                 setTimeout(() => {
                     window.location.href = './index.html';
-                }, 1000);
+                }, 800);
             } else {
                 showMessage('error', '用户名或密码错误');
                 setLoading(false);
             }
-        });
-        
-        // GitHub登录
-        githubBtn.addEventListener('click', () => {
-            showMessage('info', 'GitHub登录功能需要配置OAuth，请联系管理员');
         });
         
         // 检查是否已登录

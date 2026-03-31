@@ -187,6 +187,18 @@ img {
     background: rgba(255, 255, 255, 0.1);
 }
 
+/* 管理员入口链接 */
+.admin-link {
+    background: rgba(99, 102, 241, 0.2) !important;
+    border: 1px solid rgba(99, 102, 241, 0.4);
+    color: #a5b4fc !important;
+}
+
+.admin-link:hover {
+    background: rgba(99, 102, 241, 0.4) !important;
+    color: var(--white) !important;
+}
+
 .nav-toggle {
     display: none;
     flex-direction: column;
